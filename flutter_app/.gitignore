@@ -45,5 +45,4 @@ app.*.map.json
 /android/app/release
 
 assets/
-backend/node_modules/
-/Users/michelangelozampieri/Desktop/full_stack_app/backend/node_modules/
+/backend/

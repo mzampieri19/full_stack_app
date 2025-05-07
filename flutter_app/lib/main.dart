@@ -1,8 +1,11 @@
 import 'dart:html' as html;
 import 'dart:ui_web' as ui show platformViewRegistry;
 import 'package:flutter/material.dart';
+import 'package:test_app/screens/captcha_screen.dart';
+import 'package:test_app/screens/confirm_screen.dart';
 import 'package:test_app/services/auth_service.dart';
 import 'screens/auth_screen.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 
 void registerViewFactories() {
@@ -17,6 +20,7 @@ void registerViewFactories() {
 }
 
 Future<void> main() async {
+  await dotenv.load(fileName: "assets/.env");
   registerViewFactories(); // Register the view factories
   AuthService.initialize();
   runApp(const MyApp());
@@ -32,7 +36,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const AuthScreen(),
+      home: AuthScreen(username: '',),
     );
   }
 }

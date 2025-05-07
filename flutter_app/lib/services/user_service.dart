@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 /**
@@ -17,11 +18,16 @@ class UserService {
   ///
   static Future<List<dynamic>> fetchUsers() async {
     final url = Uri.parse('$baseUrl/users');
+    debugPrint('Sending GET request to: $url');
     final response = await http.get(url);
+
+    debugPrint('Response status code: ${response.statusCode}');
+    debugPrint('Response body: ${response.body}');
 
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
+      debugPrint('Failed to fetch users with status code: ${response.statusCode}');
       throw Exception('Failed to fetch users');
     }
   }

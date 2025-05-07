@@ -8,13 +8,16 @@
 const express = require('express');
 const AWS = require('aws-sdk');
 const mongoose = require('mongoose');
-const User = require('./models/User'); // MongoDB User model
 const cors = require('cors');
 const crypto = require('crypto');
+
+const User = require('./models/User'); // MongoDB User model
+const Message = require('./models/Message'); // MongoDB Message model
 
 // Load environment variables from .env file
 require('dotenv').config({ path: '/Users/michelangelozampieri/Desktop/full_stack_app/flutter_app/assets/.env' });
 
+// Initialize Express app
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -79,28 +82,6 @@ app.post('/signup', async (req, res) => {
 });
 
 /**
- * Captcha Verification Endpoint
- * This endpoint verifies the captcha response from the client.
- * It uses the Google reCAPTCHA API to validate the captcha response.
- */
-app.post('/captcha', async (req, res) => {
-  const { token } = req.body;
-  try {
-    token = request.POST_DATA['h-captcha-response']
-
-    const params = {
-      secret: process.env.HCAPTCHA_SECRET_KEY,
-      response: token,
-    }
-    const response = await http.post('https://api.hcaptcha.com/siteverify', params);
-    res.status(200).json({ message: 'Captcha verified successfully', response });
-  } catch (error) {
-    console.error('Error during captcha verification:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-/**
  * User Confirmation Endpoint
  * This endpoint allows users to confirm their sign-up by providing a username and confirmation code.
  */
@@ -131,22 +112,6 @@ app.post('/confirm', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
-/**
- * Function to generate the SECRET_HASH
- * This function generates a HMAC SHA256 hash using the username, client ID, and client secret.
- * It is used to authenticate requests to AWS Cognito.
- * @param {*} username 
- * @param {*} clientId 
- * @param {*} ClientSecret 
- * @returns 
- */
-function generateSecretHash(username, clientId, ClientSecret) {
-  const message = username + clientId;
-  const hmac = crypto.createHmac('SHA256', ClientSecret);
-  hmac.update(message);
-  return hmac.digest('base64');
-}
 
 /**
  * User Login Endpoint
@@ -187,6 +152,23 @@ app.post('/login', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+/**
+ * Function to generate the SECRET_HASH
+ * This function generates a HMAC SHA256 hash using the username, client ID, and client secret.
+ * It is used to authenticate requests to AWS Cognito.
+ * @param {*} username 
+ * @param {*} clientId 
+ * @param {*} ClientSecret 
+ * @returns 
+ */
+function generateSecretHash(username, clientId, ClientSecret) {
+  const message = username + clientId;
+  const hmac = crypto.createHmac('SHA256', ClientSecret);
+  hmac.update(message);
+  return hmac.digest('base64');
+}
+
 /**
  * User Logout Endpoint
  * This endpoint allows users to log out by providing a username.
@@ -222,6 +204,57 @@ app.get('/users', async (req, res) => {
     res.status(200).json(users);
   } catch (error) {
     console.error('Error fetching users:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+/**
+ * Message Posting Endpoint
+ * This endpoint allows users to post messages by providing a username, message, and date.
+ * It stores the message in MongoDB.
+ */
+app.post('/messages', async (req, res) => {
+  const { username, message, date } = req.body;
+
+  try {
+    const newMessage = new Message({ username, message, date });
+    await newMessage.save();
+    res.status(200).json({ message: 'Message saved successfully' });
+  } catch (error) {
+    console.error('Error saving message:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * Get All Messages Endpoint
+ * This endpoint retrieves all messages from the MongoDB database.
+ */
+app.get('/messages', async (req, res) => {
+  try {
+    const messages = await Message.find().sort({ date: -1 }); // Sort messages by date in descending order
+    res.status(200).json(messages);
+  } catch (error) {
+    console.error('Error fetching messages:', error);
+    res.status(500).json({ error: error.message });
+  }
+}
+);
+/**
+ * Get User Messages Endpoint
+ * This endpoint retrieves all messages for a specific user by username.
+ */
+app.get('/messages/:username', async (req, res) => {
+  const { username } = req.params;
+
+  try {
+    const messages = await Message
+      .find({ username })
+      .sort({ date: -1 }); // Sort messages by date in descending order
+    res.status(200).json(messages);
+  } catch (error) {
+    console.error('Error fetching user messages:', error);
     res.status(500).json({ error: error.message });
   }
 });

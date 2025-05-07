@@ -1,7 +1,8 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:crypto/crypto.dart';
+import 'package:test_app/screens/auth_screen.dart';
 
 /**
  * ConfirmScreen is a StatefulWidget that handles the confirmation of the sign-up process.
@@ -11,7 +12,6 @@ import 'package:crypto/crypto.dart';
 ///
 class ConfirmScreen extends StatefulWidget {
   final String username;
-
   const ConfirmScreen({super.key, required this.username}); // Constructor to receive the username from the sign-up process.
 
   @override
@@ -37,16 +37,20 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
 ///
 Future<void> _confirmSignUp() async {
   final code = _codeController.text.trim();
+  debugPrint('Confirmation code entered: $code');
 
   if (code.isEmpty) {
+    debugPrint('No confirmation code entered.');
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please enter the confirmation code')));
     return;
   }
 
   setState(() => _isLoading = true);
+  debugPrint('Sending confirmation request to backend...');
 
   try {
     final url = Uri.parse('http://192.168.1.2:3000/confirm'); // Replace with your backend URL
+    debugPrint('Backend URL: $url');
     final response = await http.post(
       url,
       headers: {
@@ -58,35 +62,28 @@ Future<void> _confirmSignUp() async {
       }),
     );
 
+    debugPrint('Response status code: ${response.statusCode}');
+    debugPrint('Response body: ${response.body}');
     setState(() => _isLoading = false);
 
     if (response.statusCode == 200) {
+      debugPrint('Account confirmed successfully.');
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Account confirmed successfully!')));
-      Navigator.pop(context); // Navigate back to the login screen
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => AuthScreen(username: widget.username)),
+      );
     } else {
       final error = json.decode(response.body);
-      print("Confirmation failed: $error");
+      debugPrint("Confirmation failed: $error");
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Confirmation failed: ${error["error"] ?? "Unknown error"}')));
     }
   } catch (e) {
     setState(() => _isLoading = false);
-    print('Exception: $e');
+    debugPrint('Exception occurred: $e');
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
   }
 }
-
-  /**
-   * Generates a secret hash using HMAC SHA-256.
-   * This is required by AWS Cognito for secure communication.
-   */
-  ///
-  generateSecretHash({required String username, required String clientId, required String clientSecret}) {
-    final key = utf8.encode(clientSecret);
-    final message = utf8.encode(username + clientId);
-    final hmac = Hmac(sha256, key);
-    final digest = hmac.convert(message);
-    return base64.encode(digest.bytes);
-  }
 
   /**
    * Builds the UI for the confirmation screen.
