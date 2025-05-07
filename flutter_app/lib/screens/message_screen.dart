@@ -28,6 +28,7 @@ class MessageScreen extends StatefulWidget {
 ///
 class _MessageScreenState extends State<MessageScreen> {
   final TextEditingController _messageController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   List<dynamic> _messages = [];
   bool _isLoading = true;
 
@@ -123,45 +124,62 @@ class _MessageScreenState extends State<MessageScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Messages'),
+        backgroundColor: Colors.blue,
+        centerTitle: true,
+        elevation: 0,
       ),
       body: Column(
         children: [
-          LoggedInUserWidget(username: widget.username), // Display the logged-in user's info
+          Container(
+            color: Colors.blue,
+            padding: EdgeInsets.all(16),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: Colors.white,
+                  child: Icon(Icons.person, color: Colors.blue),
+                ),
+                SizedBox(width: 10),
+                Text(
+                  'Logged in as: ${widget.username}',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              ],
+            ),
+          ),
           Expanded(
-          child: _isLoading
-              ? Center(child: CircularProgressIndicator())
-              : _messages.isEmpty
-                  ? Center(child: Text('No messages found'))
-                  : ListView.builder(
-                      reverse: true,
-                      itemCount: _messages.length,
-                      itemBuilder: (context, index) {
-                        final message = _messages[index];
-                        final isCurrentUser = message['username'] == widget.username;
+            child: _isLoading
+                ? Center(child: CircularProgressIndicator())
+                : _messages.isEmpty
+                    ? Center(child: Text('No messages found'))
+                    : ListView.builder(
+                        controller: _scrollController,
+                        itemCount: _messages.length,
+                        itemBuilder: (context, index) {
+                          final message = _messages[index];
+                          final isCurrentUser = message['username'] == widget.username;
 
-                        return Align(
-                          alignment: isCurrentUser ? Alignment.centerRight : Alignment.centerLeft,
-                          child: Container(
-                            margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                            padding: EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: isCurrentUser ? Colors.blue : Colors.grey[300],
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(15),
-                                topRight: Radius.circular(15),
-                                bottomLeft: isCurrentUser ? Radius.circular(15) : Radius.zero,
-                                bottomRight: isCurrentUser ? Radius.zero : Radius.circular(15),
-                              ),
-                            ),
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => MessageDetailScreen(message: message),
+                          return Align(
+                            alignment: isCurrentUser ? Alignment.centerRight : Alignment.centerLeft,
+                            child: Container(
+                              margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                              padding: EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: isCurrentUser ? Colors.blue : Colors.grey[200],
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(15),
+                                  topRight: Radius.circular(15),
+                                  bottomLeft: isCurrentUser ? Radius.circular(15) : Radius.zero,
+                                  bottomRight: isCurrentUser ? Radius.zero : Radius.circular(15),
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 4,
+                                    offset: Offset(0, 2),
                                   ),
-                                );
-                              },
+                                ],
+                              ),
                               child: Text(
                                 message['message'],
                                 style: TextStyle(
@@ -170,11 +188,10 @@ class _MessageScreenState extends State<MessageScreen> {
                                 ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
-      ),
+                          );
+                        },
+                      ),
+          ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
@@ -183,15 +200,25 @@ class _MessageScreenState extends State<MessageScreen> {
                   child: TextField(
                     controller: _messageController,
                     decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Enter your message',
+                      hintText: 'Enter your message',
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                   ),
                 ),
                 SizedBox(width: 8),
                 ElevatedButton(
                   onPressed: _sendMessage,
-                  child: Text('Send'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    shape: CircleBorder(),
+                    padding: EdgeInsets.all(14),
+                  ),
+                  child: Icon(Icons.send, color: Colors.white),
                 ),
               ],
             ),

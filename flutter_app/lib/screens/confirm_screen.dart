@@ -94,22 +94,78 @@ Future<void> _confirmSignUp() async {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Confirm Account')),
+      appBar: AppBar(
+        title: Text('Confirm Email'),
+        backgroundColor: Colors.blue,
+        centerTitle: true,
+        elevation: 0,
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('Enter the confirmation code sent to your email.'),
-            TextField(
-              controller: _codeController,
-              decoration: InputDecoration(labelText: 'Confirmation Code'),
+            SizedBox(height: 20),
+            Text(
+              'Confirm Your Email',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 20),
+            Card(
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  children: [
+                    Text(
+                      'Enter the confirmation code sent to your email:',
+                      style: TextStyle(fontSize: 16, color: Colors.black),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 20),
+                    TextField(
+                      controller: _codeController,
+                      decoration: InputDecoration(
+                        hintText: 'Confirmation code',
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
             SizedBox(height: 20),
             _isLoading
-                ? CircularProgressIndicator()
+                ? Center(child: CircularProgressIndicator())
                 : ElevatedButton(
-                    onPressed: _confirmSignUp,
-                    child: Text('Confirm'),
+                    onPressed: _confirmSignUp, // Call the confirmation method
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: Text(
+                      'Confirm',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
+                    ),
                   ),
           ],
         ),

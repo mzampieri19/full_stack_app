@@ -154,90 +154,97 @@ class _AuthScreenState extends State<AuthScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(isLogin ? 'Welcome Back' : 'Create an Account'),
+        backgroundColor: Colors.blue,
         centerTitle: true,
+        elevation: 0,
       ),
-      body: Column(
-        children: [          
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Center(
-                child: SingleChildScrollView(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(height: 20),
+              Text(
+                isLogin ? 'Log in to your account' : 'Sign up for a new account',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 20),
+              Card(
+                elevation: 5,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Existing UI components
-                      Card(
-                        elevation: 5,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15.0),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              CustomTextField(
-                                controller: _usernameController,
-                                labelText: 'Username',
-                                icon: Icons.person,
-                              ),
-                              SizedBox(height: 15),
-                              CustomTextField(
-                                controller: _passwordController,
-                                labelText: 'Password',
-                                icon: Icons.lock,
-                                obscureText: true,
-                              ),
-                              if (!isLogin) ...[
-                                SizedBox(height: 15),
-                                CustomTextField(
-                                  controller: _emailController,
-                                  labelText: 'Email',
-                                  icon: Icons.email,
-                                ),
-                                SizedBox(height: 15),
-                                PasswordRequirements(),
-                                SizedBox(height: 15),
-                              ],
-                            ],
-                          ),
-                        ),
+                      CustomTextField(
+                        controller: _usernameController,
+                        labelText: 'Username',
+                        icon: Icons.person,
                       ),
-                      SizedBox(height: 30),
-                      _isLoading
-                          ? Center(child: CircularProgressIndicator())
-                          : ElevatedButton(
-                              onPressed: isLogin ? _login : _signUp,
-                              style: ElevatedButton.styleFrom(
-                                padding: EdgeInsets.symmetric(vertical: 15.0),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                              ),
-                              child: Text(isLogin ? 'Login' : 'Sign Up'),
-                            ),
-                      SizedBox(height: 20),
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            isLogin = !isLogin;
-                          });
-                        },
-                        child: Text(
-                          isLogin
-                              ? 'Don’t have an account? Sign up'
-                              : 'Already have an account? Log in',
-                          style: TextStyle(color: Colors.blue),
-                        ),
+                      SizedBox(height: 15),
+                      CustomTextField(
+                        controller: _passwordController,
+                        labelText: 'Password',
+                        icon: Icons.lock,
+                        obscureText: true,
                       ),
+                      if (!isLogin) ...[
+                        SizedBox(height: 15),
+                        CustomTextField(
+                          controller: _emailController,
+                          labelText: 'Email',
+                          icon: Icons.email,
+                        ),
+                        SizedBox(height: 15),
+                        PasswordRequirements(),
+                      ],
                     ],
                   ),
                 ),
               ),
-            ),
+              SizedBox(height: 20),
+              _isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : ElevatedButton(
+                      onPressed: isLogin ? _login : _signUp,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: Text(
+                        isLogin ? 'Login' : 'Sign Up',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+              SizedBox(height: 10),
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    isLogin = !isLogin;
+                  });
+                },
+                child: Text(
+                  isLogin ? 'Don’t have an account? Sign up' : 'Already have an account? Log in',
+                  style: TextStyle(color: Colors.blue),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

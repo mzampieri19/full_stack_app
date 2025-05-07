@@ -57,6 +57,28 @@ class _CaptchaScreenState extends State<CaptchaScreen> {
   }
 
   /**
+   * Verifies the entered captcha against the generated captcha.
+   * If the captcha matches, navigates to the ConfirmScreen.
+   * Otherwise, shows an error message.
+   */
+  ///
+  void verifyCaptcha() {
+    if (captchaController.text.trim() == generatedCaptcha) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Captcha verified successfully!')));
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ConfirmScreen(username: widget.username),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Invalid captcha. Please try again.')));
+      captchaController.clear();
+      buildCaptcha(); // Generate a new captcha
+    }
+  }
+
+  /**
    * Builds the UI for the CaptchaScreen.
    * It includes a text field for entering the captcha value,
    * a button to verify the captcha, and a display for the generated captcha.
@@ -67,59 +89,92 @@ class _CaptchaScreenState extends State<CaptchaScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Captcha Verification'),
+        backgroundColor: Colors.blue,
+        centerTitle: true,
+        elevation: 0,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            SizedBox(height: 20),
             Text(
-              'Enter Captcha Value',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 16),
-            Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(8),
+              'Verify Captcha',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue,
               ),
-              child: Center(
-                child: Text(
-                  generatedCaptcha,
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 20),
+            Card(
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  children: [
+                    Text(
+                      'Please solve the captcha to proceed.',
+                      style: TextStyle(fontSize: 16),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 20),
+                    Container(
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        generatedCaptcha,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 2,
+                          color: Colors.black,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    TextField(
+                      controller: captchaController,
+                      decoration: InputDecoration(
+                        hintText: 'Enter captcha',
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-            SizedBox(height: 16),
-            TextField(
-              controller: captchaController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Enter Captcha',
-              ),
-            ),
-            SizedBox(height: 16),
+            SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                if (captchaController.text == generatedCaptcha) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Captcha Verified!')),
-                  );
-                  // Navigate to the next screen (ConfirmScreen)
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ConfirmScreen(username: widget.username),
-                    ),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Invalid Captcha!')),
-                  );
-                }
-              },
-              child: Text('Verify'),
+              onPressed: verifyCaptcha,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                padding: EdgeInsets.symmetric(vertical: 16),
+              ),
+              child: Text(
+                'Verify',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
             ),
           ],
         ),

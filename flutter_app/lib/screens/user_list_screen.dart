@@ -114,54 +114,52 @@ class _UserListScreenState extends State<UserListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('User List'),
+        backgroundColor: Colors.blue,
         centerTitle: true,
+        elevation: 0,
         actions: [
           IconButton(
             icon: Icon(Icons.logout),
-            onPressed: _logout, // Call the logout function
+            onPressed: _logout,
           ),
         ],
       ),
-      body: Column(
-        children: [
-          LoggedInUserWidget(username: widget.username), // Display the logged-in user's info
-          Expanded(
-            child: _isLoading
-                ? Center(child: CircularProgressIndicator())
-                : _users.isEmpty
-                    ? Center(child: Text('No users found'))
-                    : ListView.builder(
-                        itemCount: _users.length,
-                        itemBuilder: (context, index) {
-                          final user = _users[index];
-                          return Card(
-                            margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                            child: ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: Colors.blue,
-                                child: Text(
-                                  user['username'][0].toUpperCase(), // First letter of the username
-                                  style: TextStyle(color: Colors.white),
-                                ),
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : _users.isEmpty
+              ? Center(child: Text('No users found'))
+              : ListView.builder(
+                  itemCount: _users.length,
+                  itemBuilder: (context, index) {
+                    final user = _users[index];
+                    return Card(
+                      elevation: 5,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                      ),
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.blue,
+                          child: Icon(Icons.person, color: Colors.white),
+                        ),
+                        title: Text(user['username']),
+                        subtitle: Text(user['email']),
+                        onTap: () {
+                          // Navigate to the message screen for the selected user
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MessageScreen(
+                                username: user['username'],
+                                email: user['email'],
                               ),
-                              title: Text(user['username']),
-                              subtitle: Text(user['email']),
-                              onTap: () {
-                                // Navigate to the MessageScreen with the selected user's info
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => MessageScreen(username: user['username'], email: user['email'],),
-                                  ),
-                                );
-                              },
                             ),
                           );
                         },
                       ),
-          ),
-        ],
-      ),
+                    );
+                  },
+                ),
     );
   }
 }
