@@ -22,6 +22,12 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// Middleware to log requests
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
+
 // AWS Cognito configuration
 const cognito = new AWS.CognitoIdentityServiceProvider({
   region: process.env.COGNITO_REGION,
@@ -215,15 +221,19 @@ app.get('/users', async (req, res) => {
  * It stores the message in MongoDB.
  */
 app.post('/messages', async (req, res) => {
-  const { username, message, date } = req.body;
+  const { username, email, message, date } = req.body;
+
+  if (!username || !message || !date || !email) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
 
   try {
-    const newMessage = new Message({ username, message, date });
+    const newMessage = new Message({ username, email, message, date });
     await newMessage.save();
-    res.status(200).json({ message: 'Message saved successfully' });
+    res.status(201).json({ message: 'Message saved successfully' }); // Use 201 Created
   } catch (error) {
     console.error('Error saving message:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Failed to save message' });
   }
 });
 

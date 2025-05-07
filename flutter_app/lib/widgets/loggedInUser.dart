@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 ///
 class LoggedInUserWidget extends StatelessWidget {
   final String username;
-  const LoggedInUserWidget({Key? key, required this.username}) : super(key: key);
+  const LoggedInUserWidget({super.key, required this.username});
 
   /**
    * The build method returns a Container widget that displays the logged-in user's information.

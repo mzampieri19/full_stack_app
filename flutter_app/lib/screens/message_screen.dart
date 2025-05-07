@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:test_app/screens/message_details_screen.dart';
+import 'package:test_app/widgets/loggedInUser.dart';
 
 /**
  * MessageScreen is a StatefulWidget that displays a message screen.
@@ -12,8 +14,8 @@ import 'package:http/http.dart' as http;
 ///
 class MessageScreen extends StatefulWidget {
   final String username;
-
-  const MessageScreen({Key? key, required this.username}) : super(key: key);
+  final String email;
+  const MessageScreen({super.key, required this.username, required this.email}); // Constructor to receive the username and email from the sign-up process.
 
   @override
   _MessageScreenState createState() => _MessageScreenState();
@@ -48,7 +50,7 @@ class _MessageScreenState extends State<MessageScreen> {
   Future<void> _fetchMessages() async {
     debugPrint('Fetching messages from backend...');
     try {
-      final response = await http.get(Uri.parse('http://192.168.1.2:3000/messages')); // Replace with your backend URL
+      final response = await http.get(Uri.parse('http://192.168.1.2:3000/messages/${widget.username}'));
       debugPrint('Response status code: ${response.statusCode}');
       if (response.statusCode == 200) {
         debugPrint('Messages fetched successfully');
@@ -88,13 +90,14 @@ class _MessageScreenState extends State<MessageScreen> {
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'username': widget.username,
+          'email': widget.email,
           'message': message,
           'date': DateTime.now().toIso8601String(),
         }),
       );
 
       debugPrint('Response status code: ${response.statusCode}');
-      if (response.statusCode == 201) {
+      if (response.statusCode == 201) { // Expect 201 for success
         debugPrint('Message sent successfully');
         _messageController.clear();
         _fetchMessages(); // Refresh the messages list
@@ -123,22 +126,55 @@ class _MessageScreenState extends State<MessageScreen> {
       ),
       body: Column(
         children: [
+          LoggedInUserWidget(username: widget.username), // Display the logged-in user's info
           Expanded(
-            child: _isLoading
-                ? Center(child: CircularProgressIndicator())
-                : _messages.isEmpty
-                    ? Center(child: Text('No messages found'))
-                    : ListView.builder(
-                        itemCount: _messages.length,
-                        itemBuilder: (context, index) {
-                          final message = _messages[index];
-                          return ListTile(
-                            title: Text(message['message']),
-                            subtitle: Text('By: ${message['username']} on ${message['date']}'),
-                          );
-                        },
-                      ),
-          ),
+          child: _isLoading
+              ? Center(child: CircularProgressIndicator())
+              : _messages.isEmpty
+                  ? Center(child: Text('No messages found'))
+                  : ListView.builder(
+                      reverse: true,
+                      itemCount: _messages.length,
+                      itemBuilder: (context, index) {
+                        final message = _messages[index];
+                        final isCurrentUser = message['username'] == widget.username;
+
+                        return Align(
+                          alignment: isCurrentUser ? Alignment.centerRight : Alignment.centerLeft,
+                          child: Container(
+                            margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                            padding: EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: isCurrentUser ? Colors.blue : Colors.grey[300],
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(15),
+                                topRight: Radius.circular(15),
+                                bottomLeft: isCurrentUser ? Radius.circular(15) : Radius.zero,
+                                bottomRight: isCurrentUser ? Radius.zero : Radius.circular(15),
+                              ),
+                            ),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => MessageDetailScreen(message: message),
+                                  ),
+                                );
+                              },
+                              child: Text(
+                                message['message'],
+                                style: TextStyle(
+                                  color: isCurrentUser ? Colors.white : Colors.black,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+      ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(

@@ -151,7 +151,7 @@ class _UserListScreenState extends State<UserListScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => MessageScreen(username: user['username']),
+                                    builder: (context) => MessageScreen(username: user['username'], email: user['email'],),
                                   ),
                                 );
                               },
