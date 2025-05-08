@@ -176,15 +176,27 @@ class _ChatScreenState extends State<ChatScreen> {
                 ? Center(child: CircularProgressIndicator())
                 : _messages.isEmpty
                     ? Center(child: Text('No messages found'))
-                    : ListView.builder(
-                        controller: _scrollController,
-                        reverse: true, // Reverse the order of messages
-                        itemCount: _messages.length,
-                        itemBuilder: (context, index) {
-                          final message = _messages[index];
-                          final isFromCurrentUser = message['sender'] == widget.currentUser;
+                    :ListView.builder(
+                      controller: _scrollController,
+                      reverse: true, // Reverse the order of messages
+                      itemCount: _messages.length,
+                      itemBuilder: (context, index) {
+                        final message = _messages[index];
+                        final isFromCurrentUser = message['sender'] == widget.currentUser;
 
-                          return Align(
+                        return GestureDetector(
+                          onTap: () {
+                            // Navigate to the MessageDetailsScreen with the selected message
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MessageDetailScreen(
+                                  message: message, // Pass the entire message object
+                                ),
+                              ),
+                            );
+                          },
+                          child: Align(
                             alignment: isFromCurrentUser ? Alignment.centerRight : Alignment.centerLeft,
                             child: Container(
                               margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
@@ -207,9 +219,10 @@ class _ChatScreenState extends State<ChatScreen> {
                                 ),
                               ),
                             ),
-                          );
-                        },
-                      ),
+                          ),
+                        );
+                      },
+                    ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
