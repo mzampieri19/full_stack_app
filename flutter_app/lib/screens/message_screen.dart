@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:test_app/screens/message_details_screen.dart';
-import 'package:test_app/widgets/loggedInUser.dart';
 
 /**
  * MessageScreen is a StatefulWidget that displays a message screen.

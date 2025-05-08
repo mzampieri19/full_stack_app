@@ -6,8 +6,10 @@ const mongoose = require('mongoose');
  * It includes fields for username, message content, and the date the message was created.
  */
 const messageSchema = new mongoose.Schema({
-  username: { type: String, required: true },
-  email: { type: String, required: true },
+  sender: { type: String, required: true },
+  receiver: { type: String, required: true },
+  sender_email: { type: String, required: true },
+  reciever_email: { type: String, required: true },
   message: { type: String, required: true },
   date: { type: Date, required: true },
 });

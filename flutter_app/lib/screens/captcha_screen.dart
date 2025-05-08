@@ -13,7 +13,9 @@ import 'package:test_app/screens/confirm_screen.dart';
 ///
 class CaptchaScreen extends StatefulWidget {
   final String username; 
-  const CaptchaScreen({super.key, required this.username}); // Constructor to receive the username from the sign-up process.
+  final String email; // Added email parameter to the constructor
+  
+  const CaptchaScreen({super.key, required this.username, required this.email}); // Constructor to receive the username from the sign-up process.
 
   @override
   _CaptchaScreenState createState() => _CaptchaScreenState();
@@ -68,7 +70,7 @@ class _CaptchaScreenState extends State<CaptchaScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ConfirmScreen(username: widget.username),
+          builder: (context) => ConfirmScreen(username: widget.username, email: widget.email,),
         ),
       );
     } else {

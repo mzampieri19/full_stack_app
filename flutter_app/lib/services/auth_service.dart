@@ -76,6 +76,30 @@ class AuthService {
   }
 
   /**
+   * Fetches user details from the backend server.
+   * It makes a GET request to the /users/{username} endpoint and returns the user details as a Map.
+   */
+  ///
+  static Future<Map<String, dynamic>> getUserDetails(String username) async {
+    debugPrint('Fetching user data for username: $username');
+
+    // Correct the URL by removing the colon
+    final url = Uri.parse('http://192.168.1.2:3000/users/$username');
+    debugPrint('User data URL: $url');
+
+    final response = await http.get(url);
+
+    debugPrint('User data response status code: ${response.statusCode}');
+    debugPrint('User data response body: ${response.body}');
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to load user data');
+    }
+  }
+
+  /**
    * Signs up a new user with the provided username, password, and email.
    * Sends a POST request to the signup endpoint with the username, password, and email.
    * Returns true if the signup is successful, false otherwise.
@@ -131,6 +155,29 @@ class AuthService {
     debugPrint('Captcha verification parsed response: $body');
 
     return body['responseCode'] == 200;
+  }
+
+  /**
+   * Gets all users from the backend server.
+   * It makes a GET request to the /users endpoint and returns a list of users.
+   * Each user is represented as a Map with 'username' and 'email' keys.
+   */
+  ///
+  static Future<List<Map<String, String>>> getAllUsers() async {
+    final url = Uri.parse('http://192.168.1.2:3000/users');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.map((user) {
+        return {
+          'username': user['username'] as String, // Explicitly cast to String
+          'email': user['email'] as String, // Explicitly cast to String
+        };
+      }).toList();
+    } else {
+      throw Exception('Failed to fetch users');
+    }
   }
 
   static void initialize() {}

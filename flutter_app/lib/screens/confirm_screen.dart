@@ -12,7 +12,9 @@ import 'package:test_app/screens/auth_screen.dart';
 ///
 class ConfirmScreen extends StatefulWidget {
   final String username;
-  const ConfirmScreen({super.key, required this.username}); // Constructor to receive the username from the sign-up process.
+  final String email; // Added email parameter to the constructor
+  
+  const ConfirmScreen({super.key, required this.username, required this.email}); // Constructor to receive the username from the sign-up process.
 
   @override
   _ConfirmScreenState createState() => _ConfirmScreenState();
@@ -71,7 +73,7 @@ Future<void> _confirmSignUp() async {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Account confirmed successfully!')));
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => AuthScreen(username: widget.username)),
+        MaterialPageRoute(builder: (context) => AuthScreen(username: widget.username, email: widget.email)),
       );
     } else {
       final error = json.decode(response.body);

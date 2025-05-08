@@ -1,165 +1,85 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'chat_screen.dart';
 
-import 'message_screen.dart';
+class UserListScreen extends StatelessWidget {
+  final String currentUser;
+  final String currentUserEmail;
+  final List<Map<String, String>> users; // List of all users with their usernames and emails
 
-import '../widgets/loggedInUser.dart';
+  const UserListScreen({
+    Key? key,
+    required this.currentUser,
+    required this.currentUserEmail,
+    required this.users,
+  }) : super(key: key);
 
-/**
- * UserListScreen is a StatefulWidget that displays a list of users.
- * It fetches the user data from a backend server and displays it in a ListView.
- * The screen also includes a logout button in the AppBar.
- */
-///
-class UserListScreen extends StatefulWidget {
-  final String username;
-  const UserListScreen({super.key, required this.username});
-
-  @override
-  _UserListScreenState createState() => _UserListScreenState();
-}
-
-/**
- * _UserListScreenState is the state class for UserListScreen.
- * It manages the state of the user list, including loading indicators and user data fetching.
- */
-///
-class _UserListScreenState extends State<UserListScreen> {
-  List<dynamic> _users = [];
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchUsers();
-  }
-
-  /**
-   * Fetches the list of users from the backend server.
-   * It makes a GET request to the /users endpoint and updates the state with the fetched data.
-   */
-   ///
-  Future<void> _fetchUsers() async {
-    debugPrint('Fetching users...');
-    try {
-      final url = Uri.parse('http://192.168.1.2:3000/users'); // Replace with your backend URL
-      debugPrint('Requesting URL: $url');
-      final response = await http.get(url);
-
-      debugPrint('Response status code: ${response.statusCode}');
-      if (response.statusCode == 200) {
-        debugPrint('Response body: ${response.body}');
-        setState(() {
-          _users = json.decode(response.body);
-          _isLoading = false;
-        });
-        debugPrint('Users fetched successfully: $_users');
-      } else {
-        debugPrint('Failed to fetch users: ${response.body}');
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to fetch users')));
-      }
-    } catch (e) {
-      debugPrint('Error fetching users: $e');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error fetching users')));
-    }
-  }
-
-  /**
-   * Logs out the user by making a POST request to the /logout endpoint.
-   * It passes the username to the backend for logout processing.
-   */
-   ///
-  Future<void> _logout() async {
-    debugPrint('Initiating logout...');
-    try {
-      final url = Uri.parse('http://192.168.1.2:3000/logout'); // Replace with your backend URL
-      debugPrint('Logout URL: $url');
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: json.encode({
-          'username': widget.username,
-        }),
-      );
-
-      debugPrint('Logout response status code: ${response.statusCode}');
-      if (response.statusCode == 200) {
-        debugPrint('Logout successful');
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Logout successful!')));
-
-        // Navigate back to the login screen
-        Navigator.pop(context);
-      } else {
-        final error = json.decode(response.body);
-        debugPrint('Logout failed: ${error["error"]}');
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Logout failed: ${error["error"]}')));
-      }
-    } catch (e) {
-      debugPrint('Error during logout: $e');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error during logout: $e')));
-    }
-  }
-
-  /**
-   * Builds the UI for the UserListScreen.
-   * It displays a loading indicator while fetching data and a list of users once the data is loaded.
-   */
-   ///
   @override
   Widget build(BuildContext context) {
+    // Separate the logged-in user from the rest of the users
+    final otherUsers = users.where((user) => user['username'] != currentUser).toList();
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('User List'),
+        title: Text('Users'),
         backgroundColor: Colors.blue,
-        centerTitle: true,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: _logout,
+      ),
+      body: ListView(
+        children: [
+          // Section for the logged-in user
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Logged-in User',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
           ),
+          ListTile(
+            leading: CircleAvatar(
+              backgroundColor: Colors.blue,
+              child: Icon(Icons.person, color: Colors.white),
+            ),
+            title: Text(currentUser),
+            subtitle: Text(currentUserEmail),
+            onTap: () {
+              // Optionally handle tap for the logged-in user
+            },
+          ),
+          Divider(),
+
+          // Section for other users
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Other Users',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          ...otherUsers.map((user) {
+            return ListTile(
+              leading: CircleAvatar(
+                backgroundColor: Colors.grey,
+                child: Icon(Icons.person, color: Colors.white),
+              ),
+              title: Text(user['username']!),
+              subtitle: Text(user['email']!),
+              onTap: () {
+                // Navigate to the ChatScreen for the selected user
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatScreen(
+                      currentUser: currentUser,
+                      otherUser: user['username']!,
+                      senderEmail: currentUserEmail,
+                      recieverEmail: user['email']!,
+                    ),
+                  ),
+                );
+              },
+            );
+          }).toList(),
         ],
       ),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : _users.isEmpty
-              ? Center(child: Text('No users found'))
-              : ListView.builder(
-                  itemCount: _users.length,
-                  itemBuilder: (context, index) {
-                    final user = _users[index];
-                    return Card(
-                      elevation: 5,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15.0),
-                      ),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: Colors.blue,
-                          child: Icon(Icons.person, color: Colors.white),
-                        ),
-                        title: Text(user['username']),
-                        subtitle: Text(user['email']),
-                        onTap: () {
-                          // Navigate to the message screen for the selected user
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MessageScreen(
-                                username: user['username'],
-                                email: user['email'],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    );
-                  },
-                ),
     );
   }
 }

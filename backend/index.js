@@ -214,6 +214,29 @@ app.get('/users', async (req, res) => {
   }
 });
 
+/**
+ * Get User Info Endpoint
+ * This endpoint retrieves information for a specific user by username.
+ */
+app.get('/users/:username', async (req, res) => {
+  const { username } = req.params;
+
+  try {
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.status(200).json({
+      username: user.username,
+      email: user.email,
+    });
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    res.status(500).json({ error: 'Failed to fetch user details' });
+  }
+});
+
 
 /**
  * Message Posting Endpoint
@@ -221,19 +244,24 @@ app.get('/users', async (req, res) => {
  * It stores the message in MongoDB.
  */
 app.post('/messages', async (req, res) => {
-  const { username, email, message, date } = req.body;
+  const { sender, receiver, sender_email, reciever_email, message, date } = req.body;
 
-  if (!username || !message || !date || !email) {
+  console.log('Incoming request body:', req.body); // Log the request body for debugging
+
+  // Validate the request body
+  if (!sender || !receiver || !sender_email || !reciever_email || !message || !date) {
+    console.error('Validation failed:', req.body);
     return res.status(400).json({ error: 'All fields are required' });
   }
 
   try {
-    const newMessage = new Message({ username, email, message, date });
+    const newMessage = new Message({ sender, receiver, sender_email, reciever_email, message, date });
     await newMessage.save();
-    res.status(201).json({ message: 'Message saved successfully' }); // Use 201 Created
+    console.log('Message saved successfully:', newMessage); // Log the saved message
+    res.status(201).json({ message: 'Message sent successfully' });
   } catch (error) {
-    console.error('Error saving message:', error);
-    res.status(500).json({ error: 'Failed to save message' });
+    console.error('Error saving message:', error); // Log the error
+    res.status(500).json({ error: 'Failed to send message' });
   }
 });
 
@@ -251,6 +279,7 @@ app.get('/messages', async (req, res) => {
   }
 }
 );
+
 /**
  * Get User Messages Endpoint
  * This endpoint retrieves all messages for a specific user by username.
@@ -262,6 +291,29 @@ app.get('/messages/:username', async (req, res) => {
     const messages = await Message
       .find({ username })
       .sort({ date: -1 }); // Sort messages by date in descending order
+    res.status(200).json(messages);
+  } catch (error) {
+    console.error('Error fetching user messages:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * Get Messages Between Two Users Endpoint
+ * This endpoint retrieves all messages between two users by their usernames.
+ */
+app.get('/messages/:user1/:user2', async (req, res) => {
+  const { user1, user2 } = req.params;
+
+  try {
+    const messages = await Message.find({ // Find messages between two users
+      // Use $or to find messages where either user1 is the sender and user2 is the receiver, or vice versa
+      $or: [
+        { sender: user1, receiver: user2 }, // Messages sent from user1 to user2
+        { sender: user2, receiver: user1 }, // Messages sent from user2 to user1
+      ],
+    }).sort({ date: -1 }); // Sort messages by date in descending order
+
     res.status(200).json(messages);
   } catch (error) {
     console.error('Error fetching user messages:', error);

@@ -15,7 +15,9 @@ import '../widgets/custom_text_field.dart';
 ///
 class AuthScreen extends StatefulWidget {
   final String username; 
-  const AuthScreen({super.key, required this.username});
+  final String email;
+
+  const AuthScreen({super.key, required this.username, required this.email}); // Constructor to receive the username and email from the sign-up process.
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
@@ -58,7 +60,7 @@ class _AuthScreenState extends State<AuthScreen> {
     });
 
     try {
-      final success = await AuthService.login(username, password);
+      final success = await AuthService.login(username, password); // Modify AuthService to return user details
       debugPrint('Login API call completed');
       
       setState(() {
@@ -67,10 +69,15 @@ class _AuthScreenState extends State<AuthScreen> {
       });
 
       if (success) {
+        final userDetails = await AuthService.getUserDetails(username); // Fetch user details
+        final email = userDetails['email']; // Extract email from user details
+        final users = await AuthService.getAllUsers(); // Fetch all users
+
         debugPrint('Login successful for username: $username');
+        debugPrint('Navigating to UserListScreen with username: $username, email: $email');
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => UserListScreen(username: username)),
+          MaterialPageRoute(builder: (context) => UserListScreen(currentUser: username, currentUserEmail: email, users: users,)),
         );
       } else {
         debugPrint('Login failed for username: $username');
@@ -126,7 +133,7 @@ class _AuthScreenState extends State<AuthScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => CaptchaScreen(username: username),
+            builder: (context) => CaptchaScreen(username: username, email: widget.email,),
           ),
         );
       } else {
