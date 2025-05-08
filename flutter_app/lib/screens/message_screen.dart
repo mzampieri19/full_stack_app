@@ -161,30 +161,41 @@ class _MessageScreenState extends State<MessageScreen> {
 
                           return Align(
                             alignment: isCurrentUser ? Alignment.centerRight : Alignment.centerLeft,
-                            child: Container(
-                              margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                              padding: EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: isCurrentUser ? Colors.blue : Colors.grey[200],
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(15),
-                                  topRight: Radius.circular(15),
-                                  bottomLeft: isCurrentUser ? Radius.circular(15) : Radius.zero,
-                                  bottomRight: isCurrentUser ? Radius.zero : Radius.circular(15),
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 4,
-                                    offset: Offset(0, 2),
+                            child: GestureDetector(
+                              onTap: () {
+                                // Navigate to the MessageDetailsScreen with the message details
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => MessageDetailScreen(message: message),
                                   ),
-                                ],
-                              ),
-                              child: Text(
-                                message['message'],
-                                style: TextStyle(
-                                  color: isCurrentUser ? Colors.white : Colors.black,
-                                  fontSize: 16,
+                                );
+                              },
+                              child: Container(
+                                margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                padding: EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: isCurrentUser ? Colors.blue : Colors.grey[200],
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(15),
+                                    topRight: Radius.circular(15),
+                                    bottomLeft: isCurrentUser ? Radius.circular(15) : Radius.zero,
+                                    bottomRight: isCurrentUser ? Radius.zero : Radius.circular(15),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black12,
+                                      blurRadius: 4,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Text(
+                                  message['message'],
+                                  style: TextStyle(
+                                    color: isCurrentUser ? Colors.white : Colors.black,
+                                    fontSize: 16,
+                                  ),
                                 ),
                               ),
                             ),
