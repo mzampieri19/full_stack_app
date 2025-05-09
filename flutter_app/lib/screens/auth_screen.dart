@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:test_app/screens/captcha_screen.dart';
+import 'package:test_app/services/user_service.dart';
 import 'package:test_app/widgets/password_requirments.dart';
 
 import 'user_list_screen.dart';
@@ -42,56 +43,70 @@ class _AuthScreenState extends State<AuthScreen> {
    * and navigates to the UserListScreen if successful.
    */
   ///
-  Future<void> _login() async {
-    final username = _usernameController.text.trim();
-    final password = _passwordController.text;
+ Future<void> _login() async {
+  final username = _usernameController.text.trim();
+  final password = _passwordController.text;
 
-    debugPrint('Attempting to log in with username: $username');
+  debugPrint('Attempting to log in with username: $username');
 
-    if (username.isEmpty || password.isEmpty) {
-      debugPrint('Validation failed: Username or password is empty');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please enter both username and password')));
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-      debugPrint('Loading state set to true');
-    });
-
-    try {
-      final success = await AuthService.login(username, password); // Modify AuthService to return user details
-      debugPrint('Login API call completed');
-      
-      setState(() {
-        _isLoading = false;
-        debugPrint('Loading state set to false');
-      });
-
-      if (success) {
-        final userDetails = await AuthService.getUserDetails(username); // Fetch user details
-        final email = userDetails['email']; // Extract email from user details
-        final users = await AuthService.getAllUsers(); // Fetch all users
-
-        debugPrint('Login successful for username: $username');
-        debugPrint('Navigating to UserListScreen with username: $username, email: $email');
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => UserListScreen(currentUser: username, currentUserEmail: email, users: users,)),
-        );
-      } else {
-        debugPrint('Login failed for username: $username');
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login failed')));
-      }
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-        debugPrint('Loading state set to false due to error');
-      });
-      debugPrint('Login error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login error: $e')));
-    }
+  if (username.isEmpty || password.isEmpty) {
+    debugPrint('Validation failed: Username or password is empty');
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please enter both username and password')));
+    return;
   }
+
+  setState(() {
+    _isLoading = true;
+    debugPrint('Loading state set to true');
+  });
+
+  try {
+    final success = await AuthService.login(username, password); // Modify AuthService to return user details
+    debugPrint('Login API call completed');
+
+    if (success) {
+      final userDetails = await UserService.getUserDetails(username); // Fetch specific user details
+      final email = userDetails['email']; // Extract email from user details
+
+      // Fetch all users and extract only the required fields
+      final users = (await UserService.fetchUsers())
+          .map((user) => {
+                'username': user['username'] as String,
+                'email': user['email'] as String,
+              })
+          .toList();
+
+      debugPrint('Login successful for username: $username');
+      debugPrint('Navigating to UserListScreen with username: $username, email: $email');
+      setState(() {
+        _isLoading = false; // Reset loading state before navigation
+      });
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => UserListScreen(
+            currentUser: username,
+            currentUserEmail: email,
+            users: users,
+          ),
+        ),
+      );
+    } else {
+      debugPrint('Login failed for username: $username');
+      setState(() {
+        _isLoading = false; // Reset loading state on failure
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login failed')));
+    }
+  } catch (e) {
+    setState(() {
+      _isLoading = false; // Reset loading state on error
+      debugPrint('Loading state set to false due to error');
+    });
+    debugPrint('Login error: $e');
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login error: $e')));
+  }
+}
 
   /**
    * Sign-up function that handles user registration.
@@ -218,25 +233,25 @@ class _AuthScreenState extends State<AuthScreen> {
                 ),
               ),
               SizedBox(height: 20),
-              _isLoading
-                  ? Center(child: CircularProgressIndicator())
-                  : ElevatedButton(
-                      onPressed: isLogin ? _login : _signUp,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        padding: EdgeInsets.symmetric(vertical: 16),
+             _isLoading
+                ? Center(child: CircularProgressIndicator())
+                : ElevatedButton(
+                    onPressed: isLogin ? _login : _signUp,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
                       ),
-                      child: Text(
-                        isLogin ? 'Login' : 'Sign Up',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: Text(
+                      isLogin ? 'Login' : 'Sign Up',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
                       ),
                     ),
+                  ),
               SizedBox(height: 10),
               TextButton(
                 onPressed: () {
