@@ -1,11 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // Import the intl package for date formatting
 
+/**
+ * MessageDetailScreen is a StatelessWidget that displays the details of a message.
+ * It shows the sender, receiver, message content, date, and time.
+ * The date and time are formatted for better readability.
+ */
+///
 class MessageDetailScreen extends StatelessWidget {
   final Map<String, dynamic> message;
 
   const MessageDetailScreen({Key? key, required this.message}) : super(key: key);
 
+    /**
+     * Builds the UI for the MessageDetailScreen.
+     * It includes an AppBar, a Card for message details, and formatted date and time.
+     * The date and time are displayed in a user-friendly format.
+     */
+    ///
     @override
     Widget build(BuildContext context) {
       // Parse the date string into a DateTime object

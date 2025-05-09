@@ -108,7 +108,7 @@ class AuthService {
   static Future<bool> signUp(String username, String password, String email) async {
     debugPrint('Sign-up initiated for username: $username, email: $email');
 
-    final url = Uri.parse('$baseUrl/signup');
+    final url = Uri.parse('$baseUrl/auth/signup');
     debugPrint('Sign-up URL: $url');
 
     final response = await http.post(
@@ -164,7 +164,7 @@ class AuthService {
    */
   ///
   static Future<List<Map<String, String>>> getAllUsers() async {
-    final url = Uri.parse('http://192.168.1.2:3000/users');
+    final url = Uri.parse('http://192.168.1.2:3000/users/getAllUsers');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {

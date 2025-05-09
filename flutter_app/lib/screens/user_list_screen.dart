@@ -1,11 +1,22 @@
 import 'package:flutter/material.dart';
 import 'chat_screen.dart';
 
+/**
+ * UserListScreen is a StatelessWidget that displays a list of users.
+ * It shows the logged-in user at the top and other users below.
+ * Tapping on a user navigates to the ChatScreen for that user.
+ */
+///
 class UserListScreen extends StatelessWidget {
   final String currentUser;
   final String currentUserEmail;
   final List<Map<String, String>> users; // List of all users with their usernames and emails
 
+  /**
+   * Constructor for UserListScreen.
+   * It takes the current user's username, email, and a list of users as parameters.
+   */
+  ///
   const UserListScreen({
     Key? key,
     required this.currentUser,
@@ -13,6 +24,11 @@ class UserListScreen extends StatelessWidget {
     required this.users,
   }) : super(key: key);
 
+  /**
+   * Builds the UserListScreen widget.
+   * It separates the logged-in user from the rest of the users and displays them in a ListView.
+   */
+  ///
   @override
   Widget build(BuildContext context) {
     // Separate the logged-in user from the rest of the users

@@ -17,7 +17,7 @@ class UserService {
    */
   ///
   static Future<List<dynamic>> fetchUsers() async {
-    final url = Uri.parse('$baseUrl/users');
+    final url = Uri.parse('$baseUrl/users/');
     debugPrint('Sending GET request to: $url');
     final response = await http.get(url);
 

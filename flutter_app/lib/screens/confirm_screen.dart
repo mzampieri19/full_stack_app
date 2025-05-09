@@ -51,7 +51,7 @@ Future<void> _confirmSignUp() async {
   debugPrint('Sending confirmation request to backend...');
 
   try {
-    final url = Uri.parse('http://192.168.1.2:3000/confirm'); // Replace with your backend URL
+    final url = Uri.parse('http://192.168.1.2:3000/auth/confirm');
     debugPrint('Backend URL: $url');
     final response = await http.post(
       url,
