@@ -91,3 +91,46 @@ exports.confirm_signup = async (req, res) => {
         res.status(500).json({ error: error.message });
       }
   };
+
+/**
+ * Sign-in controller function
+ * @param {Object} req - The request object containing user credentials
+ * @param {Object} res - The response object to send the response
+ * @returns {Promise<void>} - A promise that resolves when the response is sent
+ * @throws {Error} - Throws an error if the sign-in process fails
+ */
+exports.login = async (req, res) => {
+    const { username, password } = req.body;
+  
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password are required' });
+    }
+  
+    try {
+      // Generate the SECRET_HASH
+      const secretHash = generateSecretHash(
+        username,
+        process.env.COGNITO_CLIENT_ID,
+        process.env.COGNITO_CLIENT_SECRET
+      );
+  
+      // Log in the user with AWS Cognito
+      const params = {
+        AuthFlow: 'ADMIN_NO_SRP_AUTH',
+        ClientId: process.env.COGNITO_CLIENT_ID,
+        UserPoolId: process.env.COGNITO_USER_POOL_ID,
+        AuthParameters: {
+          USERNAME: username,
+          PASSWORD: password,
+          SECRET_HASH: secretHash,
+        },
+      };
+  
+      const cognitoResponse = await cognito.adminInitiateAuth(params).promise();
+  
+      res.status(200).json({ message: 'User logged in successfully', cognitoResponse });
+    } catch (error) {
+      console.error('Error during login:', error);
+      res.status(500).json({ error: error.message });
+    }
+}
