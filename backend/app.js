@@ -14,10 +14,13 @@ const messageRoutes = require('./routes/messageRoutes');
 const userRoutes = require('./routes/userRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 
-const app = express();
+dotenv.config();
+console.log('Environment variables loaded');
 
+const app = express();
 app.use(express.json());
 app.use(cors());
+console.log('Middleware configured');
 
 // Middleware to log requests
 app.use((req, res, next) => {
@@ -30,5 +33,6 @@ app.use('/auth', authRoutes);
 app.use('/messages', messageRoutes);
 app.use('/users', userRoutes);
 app.use('/gemini', aiRoutes);
+console.log('Routes configured');
 
 module.exports = app;

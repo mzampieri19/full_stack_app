@@ -39,6 +39,7 @@ dependencies:
   flutter_recaptcha_v2_compat: ^1.0.5
   webview_flutter: ^4.11.0
   hcaptcha_flutter: ^0.0.1+1
+  file_picker: ^8.0.7
 
 
 

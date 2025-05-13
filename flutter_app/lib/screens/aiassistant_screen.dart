@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:test_app/services/gemini_service.dart';
+import 'package:file_picker/file_picker.dart';
 
 /**
  * This is the AI Assistant screen that allows users to interact with the AI.
@@ -25,18 +28,10 @@ class _AiassistantScreenState extends State<AiassistantScreen> {
   bool _isLoading = false;
   String username = '';
   String email = '';
-final TextEditingController _queryController = TextEditingController();
+  File? _selectedFile;
+  final TextEditingController _queryController = TextEditingController();
   final List<Map<String, String>> _messages = []; // Stores the conversation (user and AI messages)
 
-
-  @override
-  void initState() {
-    super.initState();
-    username = widget.username;
-    email = widget.email;
-    debugPrint('Username: $username, Email: $email');
-  }
-  
 /**
  * This function fetches data from the Gemini API based on the user's query.
  * It handles the loading state and displays appropriate messages based on the API response.
@@ -44,39 +39,46 @@ final TextEditingController _queryController = TextEditingController();
  * It checks if the query is empty and shows a snackbar message if it is.
  */
 ///
-Future<void> _fetchGeminiData(String query) async {
-  debugPrint('Fetching data from Gemini API with query: $query');
-  if (query.isEmpty) {
-    debugPrint('Query is empty, please provide a valid query');
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please enter a valid query')));
-    return;
-  }
-
-  setState(() {
-    _isLoading = true;
-    debugPrint('Loading state set to true');
-  });
-
-  try {
-    final success = await GeminiService.fetchGeminiData(query, username, email);
-    debugPrint('Gemini API call completed');
-
-    if (success) {
-      debugPrint('Data fetched successfully');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Data fetched successfully')));
-    } else {
-      debugPrint('Error fetching data from Gemini API');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error fetching data')));
-
+  Future<void> _fetchGeminiData(String query) async {
+    if (query.isEmpty && _selectedFile == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a query or attach a file')),
+      );
+      return;
     }
-  } catch (e) {
-    debugPrint('Gemini API call failed: $e');
+
     setState(() {
-      _isLoading = false;
+      _isLoading = true;
+      if (query.isNotEmpty) {
+        _messages.add({'sender': 'user', 'text': query}); // Add user message
+      }
     });
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+
+    try {
+      final response = await GeminiService.fetchGeminiData(query, username, email); // Send query and file
+      setState(() {
+        _messages.add({'sender': 'ai', 'text': response.toString()}); // Add AI message
+      });
+    } catch (e) {
+      setState(() {
+        _messages.add({'sender': 'ai', 'text': 'Error: $e'}); // Add error message
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+        _selectedFile = null; // Reset file after sending
+      });
+    }
   }
-}
+
+  Future<void> _pickFile() async {
+    final result = await FilePicker.platform.pickFiles();
+    if (result != null && result.files.single.path != null) {
+      setState(() {
+        _selectedFile = File(result.files.single.path!);
+      });
+    }
+  }
 
 /**
  * This function builds the UI for the AI Assistant screen.
@@ -97,9 +99,9 @@ Future<void> _fetchGeminiData(String query) async {
           // Conversation area
           Expanded(
             child: Container(
-              color: Colors.white, // Set background to white
+              color: Colors.white,
               child: ListView.builder(
-                reverse: true, // Show the latest message at the bottom
+                reverse: true,
                 itemCount: _messages.length,
                 itemBuilder: (context, index) {
                   final message = _messages[_messages.length - 1 - index];
@@ -131,13 +133,20 @@ Future<void> _fetchGeminiData(String query) async {
             color: Colors.white,
             child: Row(
               children: [
+                // File picker button
+                IconButton(
+                  icon: const Icon(Icons.attach_file),
+                  onPressed: _pickFile,
+                ),
                 // Text input field
                 Expanded(
                   child: TextField(
                     controller: _queryController,
-                    decoration: const InputDecoration(
-                      hintText: 'Type your query...',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      hintText: _selectedFile != null
+                          ? 'File attached: ${_selectedFile!.path.split('/').last}'
+                          : 'Type your query...',
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                 ),

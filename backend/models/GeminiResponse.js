@@ -12,6 +12,7 @@ const GeminiResponseSchema = new mongoose.Schema({
     date: { type: Date, default: Date.now },
     sender: { type: String, required: true },
     sender_email: { type: String, required: true },
+    fileData: { type: Buffer, required: false }, // Optional field for file data
 });
 
 module.exports = mongoose.model('GeminiResponse', GeminiResponseSchema);

@@ -4,10 +4,12 @@
  */
 
 const express = require('express');
+const multer = require('multer');
 const { sendQuery } = require('../controllers/aiController');
 
 const router = express.Router();
+const upload = multer({ dest: 'uploads/' });
 
-router.post('gemini', sendQuery);
+router.post('/gemini/', upload.single('file'), sendQuery);
 
 module.exports = router;
