@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'chat_screen.dart';
+import 'aiassistant_screen.dart';
 
 /**
  * UserListScreen is a StatelessWidget that displays a list of users.
@@ -18,11 +19,11 @@ class UserListScreen extends StatelessWidget {
    */
   ///
   const UserListScreen({
-    Key? key,
+    super.key,
     required this.currentUser,
     required this.currentUserEmail,
     required this.users,
-  }) : super(key: key);
+  });
 
   /**
    * Builds the UserListScreen widget.
@@ -61,7 +62,6 @@ class UserListScreen extends StatelessWidget {
             },
           ),
           Divider(),
-
           // Section for other users
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -93,9 +93,22 @@ class UserListScreen extends StatelessWidget {
                 );
               },
             );
-          }).toList(),
+          }),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context, 
+            MaterialPageRoute(
+              builder: (context) => AiassistantScreen(username: currentUser, email: currentUserEmail) // Pass the current user's username and email to AiassistantScreen,
+            ),
+          );
+        },
+        child: Icon(Icons.add),
+        backgroundColor: Colors.blue,
+      ),
+
     );
   }
 }

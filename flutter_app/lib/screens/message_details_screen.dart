@@ -10,7 +10,7 @@ import 'package:intl/intl.dart'; // Import the intl package for date formatting
 class MessageDetailScreen extends StatelessWidget {
   final Map<String, dynamic> message;
 
-  const MessageDetailScreen({Key? key, required this.message}) : super(key: key);
+  const MessageDetailScreen({super.key, required this.message});
 
     /**
      * Builds the UI for the MessageDetailScreen.

@@ -1,6 +1,7 @@
 import 'dart:html' as html;
 import 'dart:ui_web' as ui show platformViewRegistry;
 import 'package:flutter/material.dart';
+import 'package:test_app/screens/aiassistant_screen.dart';
 import 'package:test_app/services/auth_service.dart';
 import 'screens/auth_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -57,7 +58,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: AuthScreen(username: '', email: '',),
+      home: AiassistantScreen(username: '', email: '',),
     );
   }
 }

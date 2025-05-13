@@ -7,6 +7,8 @@
 
 const express = require('express');
 const cors = require('cors');
+const axios = require('axios');
+const dotenv = require('dotenv');
 const authRoutes = require('./routes/authRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const userRoutes = require('./routes/userRoutes');

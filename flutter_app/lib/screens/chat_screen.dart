@@ -17,12 +17,12 @@ class ChatScreen extends StatefulWidget {
   final String recieverEmail;
 
   const ChatScreen({
-    Key? key,
+    super.key,
     required this.currentUser,
     required this.otherUser,
     required this.senderEmail,
     required this.recieverEmail,
-  }) : super(key: key);
+  });
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
