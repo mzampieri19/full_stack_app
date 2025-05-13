@@ -3,8 +3,11 @@
  * @description This file defines the routes for user authentication, specifically the signup route.
  */
 
+console.log('Loading authRoutes...');
 const express = require('express');
+console.log('Express module loaded');
 const { signup, confirm_signup, login } = require('../controllers/authController');
+console.log('Auth controller loaded');
 
 const router = express.Router();
 

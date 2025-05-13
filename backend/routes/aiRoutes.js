@@ -4,12 +4,15 @@
  */
 
 const express = require('express');
-const multer = require('multer');
-const { sendQuery } = require('../controllers/aiController');
-
 const router = express.Router();
-const upload = multer({ dest: 'uploads/' });
+const aiController = require('../controllers/aiController');
 
-router.post('/gemini/', upload.single('file'), sendQuery);
+console.log('AI routes initialized');
+
+// Define the POST / route for /gemini
+router.post('/', (req, res, next) => {
+  console.log('POST /gemini route hit');
+  next();
+}, aiController.sendQuery);
 
 module.exports = router;

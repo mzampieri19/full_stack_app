@@ -1,4 +1,6 @@
+console.log('Message model loaded');
 const mongoose = require('mongoose');
+console.log('Mongoose module loaded');
 
 /**
  * Message Schema

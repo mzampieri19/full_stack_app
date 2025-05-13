@@ -1,10 +1,13 @@
+console.log('Loading User model');
 const mongoose = require('mongoose');
+console.log('Mongoose loaded successfully');
 
 /**
  * User Schema
  * This schema defines the structure of the User document in MongoDB.
  * It includes fields for username, password, email, AWS Cognito UserSub, and the date the user was created.
  */
+console.log('User model loaded');
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true }, 

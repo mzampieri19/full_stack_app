@@ -6,8 +6,6 @@
 const app = require('./app'); // Import the Express app
 const connectDB = require('./config/db'); // Import the database connection function
 const { PORT } = require('./config/env'); // Import environment variables
-console.log('Environment variables loaded');
 
 connectDB(); // Establish MongoDB connection
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-console.log('Server started');

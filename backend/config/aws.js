@@ -5,8 +5,10 @@
  * The region is imported from the environment variables.
  */
 
+console.log('Loading aws.js...');
 const AWS = require('aws-sdk');
 const { COGNITO_REGION } = require('./env');
+console.log('AWS SDK loaded');
 
 const cognito = new AWS.CognitoIdentityServiceProvider({
   region: COGNITO_REGION,

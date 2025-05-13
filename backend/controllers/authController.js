@@ -7,7 +7,9 @@
  */
 
 const cognito = require('../config/aws');
+console.log('Cognito SDK loaded');
 const User = require('../models/User');
+console.log('User model loaded');
 const { generateSecretHash } = require('../utils/hashUtils');
 const { COGNITO_CLIENT_ID, COGNITO_CLIENT_SECRET } = require('../config/env');
 

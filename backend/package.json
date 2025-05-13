@@ -20,7 +20,7 @@
     "express-session": "^1.18.1",
     "jwks-rsa": "^3.2.0",
     "mongodb": "^6.16.0",
-    "mongoose": "^8.14.1",
+    "mongoose": "^8.14.3",
     "openid-client": "^5.7.0"
   }
 }

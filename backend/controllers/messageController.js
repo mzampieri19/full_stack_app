@@ -5,8 +5,9 @@
  * The functions interact with the Message model to perform database operations.
  * The controller handles errors and sends appropriate JSON responses to the client.
  */
-
+console.log('Loading messageController...');
 const Message = require('../models/Message');
+console.log('Message model loaded');
 
 /**
  * Get messages between two users

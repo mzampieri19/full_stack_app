@@ -12,42 +12,41 @@ const path = require('path');
  * @param {*} res 
  * @returns {Promise<void>}
  */
-exports.sendQuery = async (req , res) => {
-    const {query, date, sender, sender_email} = req.body;
-    const file = req.file;
-    // emsures that the request body contains all required fields
-    if ((!query || !date || !sender || !sender_email) && !file) {
-        debugPrint('Missing required fields in request body');
-        return res.status(400).json({ error: 'Please provide all required fields' });
+exports.sendQuery = async (req, res) => {
+    const { query, date, sender, email, fileData} = req.body;
+    debugPrint('Received request body:', req.body);
+    if (!query || !date || !sender || !email) {
+        return res.status(400).json({ error: 'Missing required fields' });
     }
-    // Try to generate a response using the Gemini API
+
+    const API_KEY = process.env.GEMINI_API_KEY;
+    const ai = new GoogleGenAI({ apiKey: API_KEY });
+    console.log('GoogleGenAI initialized');
+
     try {
-        let fileData = null;
-        if (file) {
-          fileData = fs.readFileSync(file.path); // Read file content
-          fs.unlinkSync(file.path); // Delete file after reading
-        }    
-        // Import the Gemini API client
-        client = genai.Client(api_key=process.env.GEMINI_API_KEY);
-        // Generate a response using the Gemini API
-        response = client.models.generate_content(
-                    model="gemini-2.0-flash", 
-                    contents=`Based on the following patient report, please provide a at home patient care report: ${query}`
-                );  res.status(200).json({ response: response });
-        // Save the response to the database
-        const geminiRes = new GeminiResponse({
-            response,
-            query,
-            model,
-            date,
-            sender,
-            sender_email,
-            fileData
+        const response = await ai.models.generateContent({
+            model: "gemini-2.0-flash",
+            contents: "Explain how AI works in a few words",
         });
-        await geminiRes.save();
-        res.status(200).json({ message: 'Response saved successfully', geminiRes });
+        console.log(response.text);
+
+        const geminiResponse = new GeminiResponse({
+            response: response.data,
+            query: query,
+            model: 'Gemini',
+            date: date,
+            sender: sender,
+            sender_email: email,
+            fileData: fileData ? fs.readFileSync(fileData) : null, // Read file data if provided
+        });
+
+        await geminiResponse.save();
+        console.log('Response saved to database:', geminiResponse);
+        res.status(200).json({ message: 'Response saved to database', response: geminiResponse });
+
+        return response.data;
     } catch (error) {
-        console.error('Error generating response:', error);
-        res.status(500).json({ error: 'Failed to generate response' });
+        console.error('Error sending query to Gemini API:', error);
+        return res.status(500).json({ error: 'Error sending query to Gemini API' });
     }
-}
+};

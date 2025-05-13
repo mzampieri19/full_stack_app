@@ -1,26 +1,32 @@
-/**
- * @fileoverview The main application file
- * @description This file sets up the Express application, middleware, and routes.
- * It imports the necessary modules, configures middleware for JSON parsing and CORS, and defines routes for authentication, messages, and users.
- * The application is exported for use in the server file.
- */
-
 const express = require('express');
-const cors = require('cors');
-const axios = require('axios');
-const dotenv = require('dotenv');
-const authRoutes = require('./routes/authRoutes');
-const messageRoutes = require('./routes/messageRoutes');
-const userRoutes = require('./routes/userRoutes');
-const aiRoutes = require('./routes/aiRoutes');
+console.log('Express module loaded');
 
-dotenv.config();
-console.log('Environment variables loaded');
+const cors = require('cors');
+console.log('CORS module loaded');
+
+const dotenv = require('dotenv');
+console.log('Dotenv module loaded');
+
+const authRoutes = require('./routes/authRoutes');
+console.log('Auth routes loaded');
+
+const messageRoutes = require('./routes/messageRoutes');
+console.log('Message routes loaded');
+
+const userRoutes = require('./routes/userRoutes');
+console.log('User routes loaded');
+
+const aiRoutes = require('./routes/aiRoutes');
+console.log('AI routes loaded');
 
 const app = express();
+console.log('Express app initialized');
+
 app.use(express.json());
+console.log('JSON middleware added');
+
 app.use(cors());
-console.log('Middleware configured');
+console.log('CORS middleware added');
 
 // Middleware to log requests
 app.use((req, res, next) => {
@@ -30,9 +36,16 @@ app.use((req, res, next) => {
 
 // Routes
 app.use('/auth', authRoutes);
+console.log('Auth routes mounted');
+
 app.use('/messages', messageRoutes);
+console.log('Message routes mounted');
+
 app.use('/users', userRoutes);
+console.log('User routes mounted');
+
 app.use('/gemini', aiRoutes);
-console.log('Routes configured');
+console.log('AI routes mounted');
 
 module.exports = app;
+console.log('App module exported');

@@ -105,8 +105,8 @@ class UserListScreen extends StatelessWidget {
             ),
           );
         },
-        child: Icon(Icons.add),
         backgroundColor: Colors.blue,
+        child: Icon(Icons.add),
       ),
 
     );

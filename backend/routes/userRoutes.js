@@ -3,6 +3,7 @@
  * @description This file defines the routes for user-related operations, including fetching all users and getting a specific user by username.
  */
 
+console.log('Loading userRoutes...');
 const express = require('express');
 const { getAllUsers, getUserByUsername } = require('../controllers/userController');
 

@@ -26,8 +26,6 @@ class AiassistantScreen extends StatefulWidget {
 ///
 class _AiassistantScreenState extends State<AiassistantScreen> {
   bool _isLoading = false;
-  String username = '';
-  String email = '';
   File? _selectedFile;
   final TextEditingController _queryController = TextEditingController();
   final List<Map<String, String>> _messages = []; // Stores the conversation (user and AI messages)
@@ -40,43 +38,57 @@ class _AiassistantScreenState extends State<AiassistantScreen> {
  */
 ///
   Future<void> _fetchGeminiData(String query) async {
+    debugPrint('Starting _fetchGeminiData with query: $query');
     if (query.isEmpty && _selectedFile == null) {
+      debugPrint('No query or file provided');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter a query or attach a file')),
       );
       return;
     }
-
     setState(() {
       _isLoading = true;
+      debugPrint('Set _isLoading to true');
       if (query.isNotEmpty) {
         _messages.add({'sender': 'user', 'text': query}); // Add user message
+        debugPrint('Added user message: $query');
       }
     });
 
     try {
-      final response = await GeminiService.fetchGeminiData(query, username, email); // Send query and file
+      debugPrint('Calling GeminiService.fetchGeminiData');
+      final response = await GeminiService.fetchGeminiData(query, widget.username, widget.email); // Send query and file
+      debugPrint('Received response from GeminiService: $response');
       setState(() {
         _messages.add({'sender': 'ai', 'text': response.toString()}); // Add AI message
+        debugPrint('Added AI message: $response');
       });
     } catch (e) {
+      debugPrint('Error occurred: $e');
       setState(() {
         _messages.add({'sender': 'ai', 'text': 'Error: $e'}); // Add error message
+        debugPrint('Added error message: Error: $e');
       });
     } finally {
       setState(() {
         _isLoading = false;
         _selectedFile = null; // Reset file after sending
+        debugPrint('Set _isLoading to false and reset _selectedFile');
       });
     }
   }
 
   Future<void> _pickFile() async {
+    debugPrint('Opening file picker...');
     final result = await FilePicker.platform.pickFiles();
     if (result != null && result.files.single.path != null) {
+      debugPrint('File selected: ${result.files.single.path}');
       setState(() {
         _selectedFile = File(result.files.single.path!);
+        debugPrint('Set _selectedFile to: $_selectedFile');
       });
+    } else {
+      debugPrint('No file selected or operation canceled.');
     }
   }
 
@@ -145,7 +157,7 @@ class _AiassistantScreenState extends State<AiassistantScreen> {
                     decoration: InputDecoration(
                       hintText: _selectedFile != null
                           ? 'File attached: ${_selectedFile!.path.split('/').last}'
-                          : 'Type your query...',
+                          : 'Enter your question here...',
                       border: const OutlineInputBorder(),
                     ),
                   ),
