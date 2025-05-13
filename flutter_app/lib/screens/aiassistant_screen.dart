@@ -58,7 +58,7 @@ Future<void> _fetchGeminiData(String query) async {
   });
 
   try {
-    final success = await GeminiService.fetchGeminiData(query);
+    final success = await GeminiService.fetchGeminiData(query, username, email);
     debugPrint('Gemini API call completed');
 
     if (success) {

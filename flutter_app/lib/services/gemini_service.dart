@@ -6,10 +6,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 class GeminiService {
-  static final String baseUrl = 'http://192.168.1.2:3000';
+  static final String baseUrl = dotenv.env['BASE_URL'] ?? '';
   static final String apiKey = dotenv.env['GEMINI_API_KEY'] ?? '';
 
-  static Future<bool> fetchGeminiData(String query) async {
+  static Future<bool> fetchGeminiData(String query, String username, String email) async {
     debugPrint('Fetching data from Gemini API with query: $query');
     final url = Uri.parse('$baseUrl/gemini');
     final response = await http.post(
@@ -18,7 +18,12 @@ class GeminiService {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $apiKey',
       },
-      body: jsonEncode({'query': query}),
+      body: jsonEncode({
+        'query': query,
+        'date': DateTime.now().toIso8601String(),
+        'sender': username,
+        'sender_email': email,
+      }),
     );
 
     if (response.statusCode == 200) {

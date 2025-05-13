@@ -12,6 +12,7 @@ const dotenv = require('dotenv');
 const authRoutes = require('./routes/authRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const userRoutes = require('./routes/userRoutes');
+const aiRoutes = require('./routes/aiRoutes');
 
 const app = express();
 
@@ -28,5 +29,6 @@ app.use((req, res, next) => {
 app.use('/auth', authRoutes);
 app.use('/messages', messageRoutes);
 app.use('/users', userRoutes);
+app.use('/gemini', aiRoutes);
 
 module.exports = app;

@@ -12,7 +12,7 @@ import '../utils/secret_hash.dart';
  */
 ///
 class AuthService {
-  static final String baseUrl = 'http://192.168.1.2:3000';
+  static final String baseUrl = dotenv.env['BASE_URL'] ?? '';
   static final String clientId = dotenv.env['CLIENT_ID'] ?? '';
   static final String clientSecret = dotenv.env['CLIENT_SECRET'] ?? '';
   static final String cognitoRegion = dotenv.env['COGNITO_REGION'] ?? '';
