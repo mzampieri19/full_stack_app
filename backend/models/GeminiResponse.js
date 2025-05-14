@@ -1,18 +1,16 @@
-const mongoose = require('mongoose');
-
+import mongoose from 'mongoose';
 /**
  * GeminiResponse Schema
  * This schema defines the structure of the GeminiResponse document in MongoDB.
  * It includes fields for response, query, model, date, sender, and sender_email.
  */
 const GeminiResponseSchema = new mongoose.Schema({
-    response: { type: String, required: true },
     query: { type: String, required: true },
-    model: { type: String, required: true },
-    date: { type: Date, default: Date.now },
+    response: { type: String, required: true },
+    model: { type: String },
+    date: { type: String, required: true },
     sender: { type: String, required: true },
     sender_email: { type: String, required: true },
-    fileData: { type: Buffer, required: false }, // Optional field for file data
 });
 
-module.exports = mongoose.model('GeminiResponse', GeminiResponseSchema);
+export default mongoose.model('GeminiResponse', GeminiResponseSchema);

@@ -31,11 +31,14 @@ class GeminiService {
       'query': query,
       'date': DateTime.now().toIso8601String(),
       'sender': username,
-      'sender_email': email,
+      'email': email,
+      'fileData': null, // Assuming fileData is not used in this request
     });
     debugPrint('Request Body: $requestBody');
 
     try {
+      debugPrint('Sending POST request to $url with headers: {Content-Type: application/json, Authorization: Bearer $apiKey}');
+      debugPrint('Request Body: $requestBody');
       final response = await http.post(
         url,
         headers: {

@@ -4,9 +4,9 @@
  */
 
 console.log('Loading authRoutes...');
-const express = require('express');
+import express from 'express'
 console.log('Express module loaded');
-const { signup, confirm_signup, login } = require('../controllers/authController');
+import { signup, confirm_signup, login } from '../controllers/authController.js'; // Ensure the .js extension is included
 console.log('Auth controller loaded');
 
 const router = express.Router();
@@ -15,4 +15,4 @@ router.post('/signup', signup);
 router.post('/confirm', confirm_signup);
 router.post('/login', login);
 
-module.exports = router;
+export default router;

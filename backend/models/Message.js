@@ -1,5 +1,5 @@
 console.log('Message model loaded');
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 console.log('Mongoose module loaded');
 
 /**
@@ -16,4 +16,4 @@ const messageSchema = new mongoose.Schema({
   date: { type: Date, required: true },
 });
 
-module.exports = mongoose.model('Message', messageSchema);
+export default mongoose.model('Message', messageSchema);

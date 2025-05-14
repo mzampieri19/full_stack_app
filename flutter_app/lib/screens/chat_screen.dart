@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:test_app/screens/message_details_screen.dart';
 
@@ -68,7 +69,8 @@ class _ChatScreenState extends State<ChatScreen> {
   ///
   Future<void> _fetchMessages() async {
     try {
-      final url = Uri.parse('http://192.168.1.2:3000/messages/${widget.currentUser}/${widget.otherUser}');
+      String baseUrl = dotenv .env['BASE_URL'] ?? '';
+      final url = Uri.parse('$baseUrl/${widget.currentUser}/${widget.otherUser}');
       debugPrint('Fetching messages for user: ${widget.currentUser} and ${widget.otherUser}');
       final response = await http.get(url);
 

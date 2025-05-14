@@ -6,8 +6,7 @@
  * The controller handles errors and sends appropriate JSON responses to the client.
  */
 
-const User = require('../models/User');
-
+import User from '../models/User.js'; // Ensure the .js extension is included
 /**
  * Get all users
  * @param {Object} req - The request object
@@ -15,7 +14,7 @@ const User = require('../models/User');
  * @returns {Promise<void>} - A promise that resolves when the response is sent
  * @throws {Error} - Throws an error if the user retrieval process fails
  */
-exports.getAllUsers = async (req, res) => {
+export const getAllUsers = async (req, res) => {
   try {
     const users = await User.find({}, { password: 0 }); // Exclude the password field
     res.status(200).json(users);
@@ -32,7 +31,7 @@ exports.getAllUsers = async (req, res) => {
  * @returns {Promise<void>} - A promise that resolves when the response is sent
  * @throws {Error} - Throws an error if the user retrieval process fails
  */
-exports.getUserByUsername = async (req, res) => {
+export const getUserByUsername = async (req, res) => {
   const { username } = req.params;
 
   try {

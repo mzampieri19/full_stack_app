@@ -4,13 +4,12 @@
  */
 
 console.log('Loading userRoutes...');
-const express = require('express');
-const { getAllUsers, getUserByUsername } = require('../controllers/userController');
-
+import express from 'express'
+import { getAllUsers, getUserByUsername } from '../controllers/userController.js'; // Ensure the .js extension is included
 const router = express.Router();
 
 router.get('/', getAllUsers);
 
 router.get('/:username', getUserByUsername);
 
-module.exports = router;
+export default router;

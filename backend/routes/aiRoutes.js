@@ -3,16 +3,15 @@
  * @description This file defines the routes for sending queries to the Gemini API and saving the response to the database.
  */
 
-const express = require('express');
+import express from 'express';
+import { sendQuery, getGeminiResponses } from '../controllers/aiController.js';
+
 const router = express.Router();
-const aiController = require('../controllers/aiController');
 
-console.log('AI routes initialized');
+// POST /geminiresponses/
+router.post('/', sendQuery);
 
-// Define the POST / route for /gemini
-router.post('/', (req, res, next) => {
-  console.log('POST /gemini route hit');
-  next();
-}, aiController.sendQuery);
+// GET /geminiresponses/
+router.get('/', getGeminiResponses);
 
-module.exports = router;
+export default router;

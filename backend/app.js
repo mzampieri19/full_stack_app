@@ -1,51 +1,36 @@
-const express = require('express');
-console.log('Express module loaded');
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import mongoose from 'mongoose';
 
-const cors = require('cors');
-console.log('CORS module loaded');
+// Route Imports
+import aiRoutes from './routes/aiRoutes.js';
+import authRoutes from './routes/authRoutes.js';
+import messageRoutes from './routes/messageRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
-const dotenv = require('dotenv');
-console.log('Dotenv module loaded');
-
-const authRoutes = require('./routes/authRoutes');
-console.log('Auth routes loaded');
-
-const messageRoutes = require('./routes/messageRoutes');
-console.log('Message routes loaded');
-
-const userRoutes = require('./routes/userRoutes');
-console.log('User routes loaded');
-
-const aiRoutes = require('./routes/aiRoutes');
-console.log('AI routes loaded');
+dotenv.config();
 
 const app = express();
-console.log('Express app initialized');
+const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
-console.log('JSON middleware added');
-
+// Middleware
 app.use(cors());
-console.log('CORS middleware added');
-
-// Middleware to log requests
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url}`);
-  next();
-});
+app.use(express.json());
 
 // Routes
 app.use('/auth', authRoutes);
-console.log('Auth routes mounted');
-
 app.use('/messages', messageRoutes);
-console.log('Message routes mounted');
-
 app.use('/users', userRoutes);
-console.log('User routes mounted');
+app.use('/geminiresponses', aiRoutes);
 
-app.use('/gemini', aiRoutes);
-console.log('AI routes mounted');
+// Start Server
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}).then(() => {
+  console.log('Connected to MongoDB');
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}).catch((err) => console.error('MongoDB connection error:', err));
 
-module.exports = app;
-console.log('App module exported');
+export default app;

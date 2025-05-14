@@ -2,51 +2,47 @@
  * @fileoverview Controller for sending queries to the Gemini API
  * @description This file contains the controller function for sending queries to the Gemini API and saving the response to the database.
  */
-const GeminiResponse = require('../models/GeminiResponse');
-const fs = require('fs');
-const path = require('path');
+import GeminiResponse from '../models/GeminiResponse.js';
+import { GoogleGenAI } from "@google/genai";
 
-/**
- * Send a query to the Gemini API and save the response to the database
- * @param {*} req 
- * @param {*} res 
- * @returns {Promise<void>}
- */
-exports.sendQuery = async (req, res) => {
-    const { query, date, sender, email, fileData} = req.body;
-    debugPrint('Received request body:', req.body);
+export const sendQuery = async (req, res) => {
+    const { query, date, sender, email, fileData } = req.body;
+
     if (!query || !date || !sender || !email) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const API_KEY = process.env.GEMINI_API_KEY;
-    const ai = new GoogleGenAI({ apiKey: API_KEY });
-    console.log('GoogleGenAI initialized');
-
     try {
-        const response = await ai.models.generateContent({
-            model: "gemini-2.0-flash",
-            contents: "Explain how AI works in a few words",
-        });
-        console.log(response.text);
+        const API_KEY = process.env.GEMINI_API_KEY;
+        const ai = new GoogleGenAI({ apiKey: API_KEY });
+        const response = await ai.generateContent({ prompt: query });
 
-        const geminiResponse = new GeminiResponse({
-            response: response.data,
-            query: query,
-            model: 'Gemini',
-            date: date,
-            sender: sender,
+        const newResponse = new GeminiResponse({
+            query,
+            response: JSON.stringify(response),
+            model: response.modelVersion,
+            date,
+            sender,
             sender_email: email,
-            fileData: fileData ? fs.readFileSync(fileData) : null, // Read file data if provided
         });
 
-        await geminiResponse.save();
-        console.log('Response saved to database:', geminiResponse);
-        res.status(200).json({ message: 'Response saved to database', response: geminiResponse });
-
-        return response.data;
+        await newResponse.save();
+        res.status(200).json({
+            message: 'Response saved successfully',
+            generatedContent: response.candidates[0].content,
+        });
     } catch (error) {
-        console.error('Error sending query to Gemini API:', error);
-        return res.status(500).json({ error: 'Error sending query to Gemini API' });
+        console.error('Error saving response to database:', error);
+        res.status(500).json({ error: 'Error saving response to database' });
+    }
+};
+
+export const getGeminiResponses = async (req, res) => {
+    try {
+        const responses = await GeminiResponse.find().sort({ date: -1 });
+        res.status(200).json(responses);
+    } catch (error) {
+        console.error('Error fetching responses:', error);
+        res.status(500).json({ error: 'Error fetching responses' });
     }
 };

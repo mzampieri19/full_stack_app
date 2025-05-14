@@ -6,7 +6,7 @@
  * The controller handles errors and sends appropriate JSON responses to the client.
  */
 console.log('Loading messageController...');
-const Message = require('../models/Message');
+import Message from '../models/Message.js'; // Ensure the .js extension is included
 console.log('Message model loaded');
 
 /**
@@ -16,7 +16,7 @@ console.log('Message model loaded');
  * @returns {Promise<void>} - A promise that resolves when the response is sent
  * @throws {Error} - Throws an error if the message retrieval process fails
  */
-exports.getMessagesBetweenUsers = async (req, res) => {
+export const getMessagesBetweenUsers = async (req, res) => {
   const { user1, user2 } = req.params;
 
   try {
@@ -41,7 +41,7 @@ exports.getMessagesBetweenUsers = async (req, res) => {
  * @returns {Promise<void>} - A promise that resolves when the response is sent
  * @throws {Error} - Throws an error if the message posting process fails
  */
-exports.postMessage = async (req, res) => {
+export const postMessage = async (req, res) => {
   const { sender, receiver, sender_email, reciever_email, message, date } = req.body;
 
   if (!sender || !receiver || !sender_email || !reciever_email || !message || !date) {

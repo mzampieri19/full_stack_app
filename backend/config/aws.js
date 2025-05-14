@@ -6,12 +6,13 @@
  */
 
 console.log('Loading aws.js...');
-const AWS = require('aws-sdk');
-const { COGNITO_REGION } = require('./env');
+import AWS from 'aws-sdk';
+import {COGNITO_REGION} from '../config/env.js';
+
 console.log('AWS SDK loaded');
 
 const cognito = new AWS.CognitoIdentityServiceProvider({
   region: COGNITO_REGION,
 });
 
-module.exports = cognito;
+export default cognito;

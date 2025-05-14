@@ -57,7 +57,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
+      //home: ChatScreen(currentUser: 'Michael', otherUser: 'icloud', senderEmail: 'michelangeloz03@gmail.com', recieverEmail: 'michii03@icloud.com')
       home: AiassistantScreen(username: 'Michael', email: 'michelangeloz03@gmail.com',),
+      //home: AuthScreen(username:'', email:''), // Set the home screen to AuthScreen
     );
   }
 }

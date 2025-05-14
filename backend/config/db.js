@@ -5,8 +5,8 @@
  * The connection is established using the `connectDB` function, which is exported for use in other parts of the application.
  */
 
-const mongoose = require('mongoose');
-const { MONGO_URI } = require('./env');
+import mongoose from 'mongoose'
+import {MONGO_URI} from '../config/env.js';
 
 const connectDB = async () => {
   try {
@@ -21,4 +21,4 @@ const connectDB = async () => {
   }
 };
 
-module.exports = connectDB;
+export default connectDB;

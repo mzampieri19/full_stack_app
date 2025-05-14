@@ -1,14 +1,10 @@
 import 'dart:io';
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:test_app/services/gemini_service.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:http/http.dart' as http;
 
-/**
- * This is the AI Assistant screen that allows users to interact with the AI.
- * It includes a text input field for users to type their queries and a response area
- */
-///
 class AiassistantScreen extends StatefulWidget {
   final String username;
   final String email;
@@ -19,87 +15,122 @@ class AiassistantScreen extends StatefulWidget {
   State<AiassistantScreen> createState() => _AiassistantScreenState();
 }
 
-/**
- * This is the state class for the AI Assistant screen.
- * It manages the state of the screen, including loading state and user input.
- */
-///
 class _AiassistantScreenState extends State<AiassistantScreen> {
   bool _isLoading = false;
   File? _selectedFile;
   final TextEditingController _queryController = TextEditingController();
-  final List<Map<String, String>> _messages = []; // Stores the conversation (user and AI messages)
+  final ScrollController _scrollController = ScrollController();
+  List<dynamic> _messages = [];
 
-/**
- * This function fetches data from the Gemini API based on the user's query.
- * It handles the loading state and displays appropriate messages based on the API response.
- * @param query The user's query to be sent to the Gemini API.
- * It checks if the query is empty and shows a snackbar message if it is.
- */
-///
-  Future<void> _fetchGeminiData(String query) async {
-    debugPrint('Starting _fetchGeminiData with query: $query');
-    if (query.isEmpty && _selectedFile == null) {
-      debugPrint('No query or file provided');
+  @override
+  void initState() {
+    super.initState();
+    _fetchResponses(); // Fetch initial messages when the screen is created
+  }
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.minScrollExtent, // Scroll to the bottom
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
+  }
+  /// Sends a query to the backend.
+  Future<void> _sendQuery(String query) async {
+    if (query.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a query or attach a file')),
+        const SnackBar(content: Text('Please enter a query')),
       );
       return;
     }
+
     setState(() {
       _isLoading = true;
-      debugPrint('Set _isLoading to true');
-      if (query.isNotEmpty) {
-        _messages.add({'sender': 'user', 'text': query}); // Add user message
-        debugPrint('Added user message: $query');
-      }
+      _messages.add({'sender': 'user', 'text': query}); // Add user message
     });
 
     try {
-      debugPrint('Calling GeminiService.fetchGeminiData');
-      final response = await GeminiService.fetchGeminiData(query, widget.username, widget.email); // Send query and file
-      debugPrint('Received response from GeminiService: $response');
-      setState(() {
-        _messages.add({'sender': 'ai', 'text': response.toString()}); // Add AI message
-        debugPrint('Added AI message: $response');
+      final url = Uri.parse('${GeminiService.baseUrl}/gemini');
+      final requestBody = jsonEncode({
+        'query': query,
+        'date': DateTime.now().toIso8601String(),
+        'sender': widget.username,
+        'email': widget.email,
+        'fileData': null,
       });
+
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${GeminiService.apiKey}',
+        },
+        body: requestBody,
+      );
+
+      if (response.statusCode == 200) {
+        debugPrint('Query sent successfully');
+        _fetchResponses(); // Fetch updated messages after sending the query
+      } else {
+        debugPrint('Request failed with status: ${response.statusCode}');
+        setState(() {
+          _messages.add({'sender': 'ai', 'text': 'Failed to fetch response from AI.'});
+        });
+      }
     } catch (e) {
-      debugPrint('Error occurred: $e');
+      debugPrint('An error occurred: $e');
       setState(() {
-        _messages.add({'sender': 'ai', 'text': 'Error: $e'}); // Add error message
-        debugPrint('Added error message: Error: $e');
+        _messages.add({'sender': 'ai', 'text': 'An error occurred while fetching the response.'});
       });
     } finally {
       setState(() {
         _isLoading = false;
-        _selectedFile = null; // Reset file after sending
-        debugPrint('Set _isLoading to false and reset _selectedFile');
       });
+    }
+  }
+
+  /// Fetches all messages from the backend and updates the UI.
+  Future<void> _fetchResponses() async {
+   try {
+      final url = Uri.parse('${GeminiService.baseUrl}/geminiresponses');
+      debugPrint('Constructed URL: $url');
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        debugPrint('Messages fetched successfully');
+        debugPrint('Response body: ${response.body}');
+        setState(() {
+          _messages = json.decode(response.body);
+          _isLoading = false;
+        });
+        _scrollToBottom();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (_scrollController.hasClients) {
+            _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+          }
+        });
+      } else {
+        debugPrint('Failed to fetch messages, status code: ${response.statusCode}');
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to fetch messages')));
+      }
+    } catch (e) {
+      debugPrint('Error fetching messages: $e');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error fetching messages: $e')));
     }
   }
 
   Future<void> _pickFile() async {
-    debugPrint('Opening file picker...');
     final result = await FilePicker.platform.pickFiles();
     if (result != null && result.files.single.path != null) {
-      debugPrint('File selected: ${result.files.single.path}');
       setState(() {
         _selectedFile = File(result.files.single.path!);
-        debugPrint('Set _selectedFile to: $_selectedFile');
       });
-    } else {
-      debugPrint('No file selected or operation canceled.');
     }
   }
 
-/**
- * This function builds the UI for the AI Assistant screen.
- * It includes an AppBar, a response area, and an input area with a text field and a send button.
- * The response area displays the AI's response or a prompt to ask a question.
- * The input area allows users to type their queries and send them to the AI.
- */
-///
- @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -157,7 +188,7 @@ class _AiassistantScreenState extends State<AiassistantScreen> {
                     decoration: InputDecoration(
                       hintText: _selectedFile != null
                           ? 'File attached: ${_selectedFile!.path.split('/').last}'
-                          : 'Enter your question here...',
+                          : 'Enter patient detials here...',
                       border: const OutlineInputBorder(),
                     ),
                   ),
@@ -169,7 +200,7 @@ class _AiassistantScreenState extends State<AiassistantScreen> {
                       ? null
                       : () {
                           final query = _queryController.text.trim();
-                          _fetchGeminiData(query);
+                          _sendQuery(query);
                           _queryController.clear();
                         },
                   child: _isLoading

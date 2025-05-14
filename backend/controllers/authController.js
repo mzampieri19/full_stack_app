@@ -6,12 +6,12 @@
  * The functions also handle error responses and send appropriate JSON responses to the client.
  */
 
-const cognito = require('../config/aws');
+import cognito from '../config/aws.js';
 console.log('Cognito SDK loaded');
-const User = require('../models/User');
+import User from '../models/User.js';
 console.log('User model loaded');
-const { generateSecretHash } = require('../utils/hashUtils');
-const { COGNITO_CLIENT_ID, COGNITO_CLIENT_SECRET } = require('../config/env');
+import { generateSecretHash } from '../utils/hashUtils.js';
+import { COGNITO_CLIENT_ID, COGNITO_CLIENT_SECRET } from '../config/env.js';
 
 /**
  * Sign-up controller function
@@ -20,7 +20,7 @@ const { COGNITO_CLIENT_ID, COGNITO_CLIENT_SECRET } = require('../config/env');
  * @returns {Promise<void>} - A promise that resolves when the response is sent
  * @throws {Error} - Throws an error if the sign-up process fails
  */
-exports.signup = async (req, res) => {
+export const signup = async (req, res) => {
   const { username, password, email } = req.body;
 
   try {
@@ -62,7 +62,7 @@ exports.signup = async (req, res) => {
  * @returns {Promise<void>} - A promise that resolves when the response is sent
  * @throws {Error} - Throws an error if the sign-in process fails
  */
-exports.confirm_signup = async (req, res) => {
+export const confirm_signup = async (req, res) => {
     const { username, confirmationCode } = req.body;
   
     if (!username || !confirmationCode) {
@@ -101,7 +101,7 @@ exports.confirm_signup = async (req, res) => {
  * @returns {Promise<void>} - A promise that resolves when the response is sent
  * @throws {Error} - Throws an error if the sign-in process fails
  */
-exports.login = async (req, res) => {
+export const login = async (req, res) => {
     const { username, password } = req.body;
   
     if (!username || !password) {

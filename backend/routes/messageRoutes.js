@@ -4,16 +4,17 @@
  */
 
 console.log('Loading messageRoutes...');
-const express = require('express');
+import express from 'express'
 console.log('Express module loaded');
-const { getMessagesBetweenUsers, postMessage } = require('../controllers/messageController');
+import { getMessagesBetweenUsers, postMessage } from '../controllers/messageController.js'; // Ensure the .js extension is included
 console.log('Message controller loaded');
 
 const router = express.Router();
 console.log('Router initialized');
 
-router.get('/:user1/:user2', getMessagesBetweenUsers);
 router.post('/', postMessage);
+router.get('/:user1/:user2', getMessagesBetweenUsers);
 console.log('Routes defined');
-module.exports = router;
+
+export default router;
 console.log('Message routes module exported');
