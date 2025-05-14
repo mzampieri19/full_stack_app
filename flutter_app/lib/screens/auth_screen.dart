@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:test_app/screens/captcha_screen.dart';
 import 'package:test_app/services/user_service.dart';
+import 'package:test_app/widgets/encouragement_widget.dart';
 import 'package:test_app/widgets/password_requirments.dart';
 
 import 'user_list_screen.dart';
@@ -264,6 +265,8 @@ class _AuthScreenState extends State<AuthScreen> {
                   style: TextStyle(color: Colors.blue),
                 ),
               ),
+              SizedBox(height: 20),
+              EncouragementWidget()
             ],
           ),
         ),

@@ -4,14 +4,12 @@
  */
 
 import express from 'express';
-import { sendQuery, getGeminiResponses } from '../controllers/aiController.js';
+import { sendQuery, getGeminiResponses, generateEncouragement, getEncouragement } from '../controllers/aiController.js';
 
 const router = express.Router();
 
-// POST /geminiresponses/
 router.post('/', sendQuery);
-
-// GET /geminiresponses/
 router.get('/', getGeminiResponses);
-
+router.post('/generateEncouragement', generateEncouragement);
+router.get('/encouragement', getEncouragement);
 export default router;
