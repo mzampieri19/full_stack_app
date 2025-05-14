@@ -6,9 +6,9 @@ import mongoose from 'mongoose';
  */
 const GeminiResponseSchema = new mongoose.Schema({
     query: { type: String, required: true },
-    response: { type: String, required: true },
+    response: { type: Object, required: true },
     model: { type: String },
-    date: { type: String, required: true },
+    date: { type: Date, required: true },
     sender: { type: String, required: true },
     sender_email: { type: String, required: true },
 });

@@ -6,24 +6,32 @@ import GeminiResponse from '../models/GeminiResponse.js';
 import { GoogleGenAI } from "@google/genai";
 
 export const sendQuery = async (req, res) => {
-    const { query, date, sender, email, fileData } = req.body;
+    const { query, date, sender, sender_email, fileData } = req.body;
 
-    if (!query || !date || !sender || !email) {
+    if (!query || !date || !sender || !sender_email) {
+        console.log('Validation failed. Missing fields:');
+        if (!query) console.log('query is missing');
+        if (!date) console.log('date is missing');
+        if (!sender) console.log('sender is missing');
+        if (!sender_email) console.log('sender_email is missing');
         return res.status(400).json({ error: 'Missing required fields' });
     }
-
     try {
         const API_KEY = process.env.GEMINI_API_KEY;
-        const ai = new GoogleGenAI({ apiKey: API_KEY });
-        const response = await ai.generateContent({ prompt: query });
+        const ai = new GoogleGenAI({vertexai: false, apiKey: API_KEY});
+        const response = await ai.models.generateContent({ 
+            model: 'gemini-2.0-flash',
+            contents: query 
+        });
 
+        const textContent = response.candidates[0].content;
         const newResponse = new GeminiResponse({
             query,
-            response: JSON.stringify(response),
+            response: textContent,
             model: response.modelVersion,
             date,
             sender,
-            sender_email: email,
+            sender_email: sender_email,
         });
 
         await newResponse.save();

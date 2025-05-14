@@ -4,7 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:test_app/services/gemini_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:test_app/utils/response_dialog.dart';
+import 'package:test_app/widgets/input_area.dart';
+import 'package:test_app/widgets/responses_list.dart';
 
+/**
+ * AiassistantScreen is a StatefulWidget that represents the AI Assistant screen.
+ * It allows users to send queries to the AI and receive responses.
+ * The screen includes a message list area and an input area for user interaction.
+ * It also handles file picking and displays the selected file name in the input area.
+ * The screen fetches responses from the server and updates the message list accordingly.
+ * The screen is initialized with the user's username and email.
+ */
+///
 class AiassistantScreen extends StatefulWidget {
   final String username;
   final String email;
@@ -15,6 +27,13 @@ class AiassistantScreen extends StatefulWidget {
   State<AiassistantScreen> createState() => _AiassistantScreenState();
 }
 
+/**
+ * _AiassistantScreenState is the state class for AiassistantScreen.
+ * It manages the state of the screen, including loading status, selected file,
+ * message list, and user input.
+ * It also handles sending queries, fetching responses, and scrolling to the bottom of the message list.
+ */
+///
 class _AiassistantScreenState extends State<AiassistantScreen> {
   bool _isLoading = false;
   File? _selectedFile;
@@ -28,6 +47,12 @@ class _AiassistantScreenState extends State<AiassistantScreen> {
     _fetchResponses(); // Fetch initial messages when the screen is created
   }
 
+  /**
+   * _scrollToBottom function scrolls the message list to the bottom.
+   * It is called after sending a query or when new messages are fetched.
+   * It uses the ScrollController to animate the scroll position.
+   */
+  ///
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
@@ -37,7 +62,15 @@ class _AiassistantScreenState extends State<AiassistantScreen> {
       );
     }
   }
-  /// Sends a query to the backend.
+
+  /**
+   * _sendQuery function sends the user's query to the server.
+   * It handles the loading state, updates the message list with the user's query,
+   * and fetches the AI's response from the server.
+   * It also handles errors and displays appropriate messages to the user.
+   * @param query The user's query to be sent to the server.
+   */
+  ///
   Future<void> _sendQuery(String query) async {
     if (query.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -48,16 +81,25 @@ class _AiassistantScreenState extends State<AiassistantScreen> {
 
     setState(() {
       _isLoading = true;
-      _messages.add({'sender': 'user', 'text': query}); // Add user message
+
+      // Add the user's query to the list with a temporary flag
+      if (!_messages.any((message) => message['text'] == query && message['sender'] == 'user')) {
+        _messages.add({
+          '_id': DateTime.now().toIso8601String(), // Temporary unique ID
+          'sender': 'user',
+          'text': query,
+          'isTemporary': true, // Mark this message as temporary
+        });
+      }
     });
 
     try {
-      final url = Uri.parse('${GeminiService.baseUrl}/gemini');
+      final url = Uri.parse('http://192.168.1.195:3000/geminiresponses');
       final requestBody = jsonEncode({
         'query': query,
         'date': DateTime.now().toIso8601String(),
         'sender': widget.username,
-        'email': widget.email,
+        'sender_email': widget.email,
         'fileData': null,
       });
 
@@ -91,36 +133,66 @@ class _AiassistantScreenState extends State<AiassistantScreen> {
     }
   }
 
-  /// Fetches all messages from the backend and updates the UI.
+  /**
+   * _fetchResponses function fetches the AI responses from the server.
+   * It updates the message list with the fetched responses and handles errors.
+   * It also removes temporary messages before updating the list.
+   * It is called when the screen is initialized and after sending a query.
+   */
+  ///
   Future<void> _fetchResponses() async {
-   try {
-      final url = Uri.parse('${GeminiService.baseUrl}/geminiresponses');
-      debugPrint('Constructed URL: $url');
+    try {
+      final url = Uri.parse('http://192.168.1.195:3000/geminiresponses');
+      debugPrint('Fetching Gemini responses from $url');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        debugPrint('Messages fetched successfully');
-        debugPrint('Response body: ${response.body}');
+        final responseData = jsonDecode(response.body);
         setState(() {
-          _messages = json.decode(response.body);
-          _isLoading = false;
-        });
-        _scrollToBottom();
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (_scrollController.hasClients) {
-            _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+          // Remove temporary messages before updating the list
+          _messages.removeWhere((message) => message['isTemporary'] == true);
+
+          for (var response in responseData) {
+            // Check if the message already exists in the list
+            if (!_messages.any((message) => message['_id'] == response['_id'])) {
+              final parsedResponse = response['response'] is String
+                  ? jsonDecode(response['response'])
+                  : response['response'];
+
+              final text = parsedResponse?['parts']?[0]?['text'] ?? 'No content available';
+              final query = response['query'] ?? 'No query available';
+              final timestamp = response['date'] ?? 'No timestamp available';
+
+              _messages.add({
+                '_id': response['_id'], // Add unique identifier
+                'sender': response['sender'] ?? 'ai',
+                'text': text,
+                'query': query, // Add the query
+                'timestamp': timestamp, // Add the timestamp
+              });
+            }
           }
         });
       } else {
-        debugPrint('Failed to fetch messages, status code: ${response.statusCode}');
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to fetch messages')));
+        debugPrint('Failed to fetch responses, status code: ${response.statusCode}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to fetch responses')),
+        );
       }
     } catch (e) {
-      debugPrint('Error fetching messages: $e');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error fetching messages: $e')));
+      debugPrint('Error fetching responses: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching responses: $e')),
+      );
     }
   }
 
+  /**
+   * _pickFile function allows the user to pick a file from their device.
+   * It uses the FilePicker package to open the file picker dialog.
+   * If a file is selected, it updates the selected file state.
+   */
+  ///
   Future<void> _pickFile() async {
     final result = await FilePicker.platform.pickFiles();
     if (result != null && result.files.single.path != null) {
@@ -130,6 +202,12 @@ class _AiassistantScreenState extends State<AiassistantScreen> {
     }
   }
 
+  /**
+   * build function builds the UI of the AiassistantScreen.
+   * It includes the AppBar, message list area, and input area.
+   * It uses the ResponsesList and InputArea widgets to display messages and handle user input.
+   */
+  ///
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -139,83 +217,25 @@ class _AiassistantScreenState extends State<AiassistantScreen> {
       ),
       body: Column(
         children: [
-          // Conversation area
+          // Message list area
           Expanded(
-            child: Container(
-              color: Colors.white,
-              child: ListView.builder(
-                reverse: true,
-                itemCount: _messages.length,
-                itemBuilder: (context, index) {
-                  final message = _messages[_messages.length - 1 - index];
-                  final isUser = message['sender'] == 'user';
-                  return Align(
-                    alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-                      padding: const EdgeInsets.all(12.0),
-                      decoration: BoxDecoration(
-                        color: isUser ? Colors.blue : Colors.grey[300],
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      child: Text(
-                        message['text']!,
-                        style: TextStyle(
-                          color: isUser ? Colors.white : Colors.black,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
+            child: ResponsesList(
+              messages: _messages,
+              onMessageTap: (message) => showMessageDetailsDialog(context, message),
+              scrollController: _scrollController,
             ),
           ),
           // Input area
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-            color: Colors.white,
-            child: Row(
-              children: [
-                // File picker button
-                IconButton(
-                  icon: const Icon(Icons.attach_file),
-                  onPressed: _pickFile,
-                ),
-                // Text input field
-                Expanded(
-                  child: TextField(
-                    controller: _queryController,
-                    decoration: InputDecoration(
-                      hintText: _selectedFile != null
-                          ? 'File attached: ${_selectedFile!.path.split('/').last}'
-                          : 'Enter patient detials here...',
-                      border: const OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                // Send button
-                ElevatedButton(
-                  onPressed: _isLoading
-                      ? null
-                      : () {
-                          final query = _queryController.text.trim();
-                          _sendQuery(query);
-                          _queryController.clear();
-                        },
-                  child: _isLoading
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : const Icon(Icons.send),
-                ),
-              ],
-            ),
+          InputArea(
+            isLoading: _isLoading,
+            queryController: _queryController,
+            onSend: (query) {
+              _sendQuery(query);
+              _queryController.clear();
+              _scrollToBottom();
+            },
+            onFilePick: _pickFile,
+            selectedFile: _selectedFile,
           ),
         ],
       ),
