@@ -29,10 +29,8 @@ class _EncouragementScreenState extends State<EncouragementScreen> {
 
         setState(() {
           // Extract the advice from the "parts" and "text" section
-          final parts = responseData['response']?['parts'];
-          _advice = parts != null && parts.isNotEmpty
-              ? parts[0]['text']
-              : 'No advice available.';
+           final text = responseData?['parts']?[0]?['text'] ?? 'No content available';
+          _advice = text; 
         });
       } else {
         setState(() {

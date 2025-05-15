@@ -3,6 +3,7 @@ import 'dart:ui_web' as ui show platformViewRegistry;
 import 'package:flutter/material.dart';
 import 'package:test_app/screens/auth_screen.dart';
 import 'package:test_app/screens/dashboard_screen.dart';
+import 'package:test_app/screens/video_tracking_screen.dart';
 import 'package:test_app/services/auth_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -58,6 +59,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
+      //home: VideoTrackingScreen()
       //home: ChatScreen(currentUser: 'Michael', otherUser: 'icloud', senderEmail: 'michelangeloz03@gmail.com', recieverEmail: 'michii03@icloud.com')
       //home: AiassistantScreen(username: 'Michael', email: 'michelangeloz03@gmail.com',),
       //home: AuthScreen(username:'', email:''), // Set the home screen to AuthScreen
@@ -86,7 +88,7 @@ class MyApp extends StatelessWidget {
                   'password': 'Michi.2003!',
                 },
               ]
-    )
+      )
     );
   }
 }
