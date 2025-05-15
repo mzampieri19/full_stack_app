@@ -3,7 +3,6 @@ import 'dart:ui_web' as ui show platformViewRegistry;
 import 'package:flutter/material.dart';
 import 'package:test_app/screens/auth_screen.dart';
 import 'package:test_app/screens/dashboard_screen.dart';
-import 'package:test_app/screens/video_tracking_screen.dart';
 import 'package:test_app/services/auth_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 

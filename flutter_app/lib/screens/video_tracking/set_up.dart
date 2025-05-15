@@ -4,6 +4,13 @@ import 'dart:js' as js;
 
 import 'package:flutter/material.dart';
 
+/**
+ * VideoTrackingScreen is a StatefulWidget that handles video tracking using the MediaPipe Pose library.
+ * It captures video from the user's camera, processes it to detect poses,
+ * and provides a timer for sit-stand transitions.
+ * It also tracks the number of times the user raises their hands.
+ */
+///
 class VideoTrackingScreen extends StatefulWidget {
   const VideoTrackingScreen({super.key});
 
@@ -11,13 +18,26 @@ class VideoTrackingScreen extends StatefulWidget {
   State<VideoTrackingScreen> createState() => _VideoTrackingScreenState();
 }
 
+/**
+ * _VideoTrackingScreenState is the state class for VideoTrackingScreen.
+ * It manages the state of the video tracking process, including hand raise count,
+ * sit-stand timer, and pose detection.
+ */
+///
 class _VideoTrackingScreenState extends State<VideoTrackingScreen> {
-  int _raiseHandsCount = 0;
-  bool _isSitting = true;
-  bool _timerRunning = false;
-  Stopwatch _sitStandTimer = Stopwatch();
-  double? _initialHipY;
+  int _raiseHandsCount = 0; // Track the number of times hands are raised
+  bool _isSitting = true; // Track if the user is sitting
+  bool _timerRunning = false; // Track if the sit-stand timer is running
+  Stopwatch _sitStandTimer = Stopwatch(); // Stopwatch for sit-stand timer
+  double? _initialHipY; // Initial Y-coordinate of the hips for sit-stand detection
 
+  /**
+   * formattedSitStandTime is a getter that formats the elapsed time of the sit-stand timer.
+   * It returns a string in the format "MM:SS.ms" where MM is minutes, SS is seconds, and ms is milliseconds.
+   * The elapsed time is calculated using the Stopwatch class.
+   * The time is formatted to ensure two digits for minutes and seconds, and two digits for milliseconds.
+   */
+  ///
   String get _formattedSitStandTime {
     final elapsed = _sitStandTimer.elapsed;
     final minutes = elapsed.inMinutes.toString().padLeft(2, '0');
@@ -29,21 +49,32 @@ class _VideoTrackingScreenState extends State<VideoTrackingScreen> {
   @override
   void initState() {
     super.initState();
-    _initializePoseTracking();
-    _updateTimerUI();
+    _initializePoseTracking(); // Initialize pose tracking
+    _updateTimerUI(); // Start the timer UI update loop
   }
 
+  /**
+   * _updateTimerUI is a method that updates the timer UI every 50 milliseconds.
+   * It checks if the timer is running and updates the state accordingly.
+   */
+  ///
   void _updateTimerUI() async {
     while (true) {
       if (_timerRunning) {
         setState(() {});
       }
-      await Future.delayed(const Duration(milliseconds: 50));
+      await Future.delayed(const Duration(milliseconds: 50)); // Update every 50 milliseconds
     }
   }
 
+  /**
+   * _initializePoseTracking is a method that sets up the video tracking using the MediaPipe Pose library.
+   * It creates a video element and a canvas element for rendering the pose landmarks.
+   * It also sets up the camera and handles pose detection results.
+   */
+  ///
   void _initializePoseTracking() {
-    final videoElement = VideoElement()
+    final videoElement = VideoElement() // Create a video element for capturing video
       ..id = 'video-element'
       ..width = 640
       ..height = 480
@@ -57,7 +88,7 @@ class _VideoTrackingScreenState extends State<VideoTrackingScreen> {
 
     document.body!.append(videoElement);
 
-    final canvas = CanvasElement(width: 640, height: 480)
+    final canvas = CanvasElement(width: 640, height: 480) // Create a canvas element for rendering pose landmarks
       ..id = 'pose-canvas'
       ..style.position = 'absolute'
       ..style.top = '50%'
@@ -68,26 +99,30 @@ class _VideoTrackingScreenState extends State<VideoTrackingScreen> {
 
     document.body!.append(canvas);
 
+    // Set up the JavaScript functions to be called from Dart
     js.context['incrementRaiseCount'] = js.allowInterop(() {
       setState(() {
         _raiseHandsCount++;
       });
     });
 
+    // Function to update sit-stand status based on hip Y-coordinate
     js.context['sitStandUpdate'] = js.allowInterop((double avgHipY) {
       if (_initialHipY == null) {
         _initialHipY = avgHipY;
       }
-
+      // Calculate the displacement from the initial hip Y-coordinate
+      // and determine if the user is sitting or standing
       final displacement = _initialHipY! - avgHipY;
       final standingThreshold = 0.15;
 
+      // Check if the user is standing
       if (!_timerRunning && displacement > standingThreshold) {
         _sitStandTimer.reset();
         _sitStandTimer.start();
         _timerRunning = true;
       }
-
+      // Check if the user is sitting
       if (_timerRunning && displacement < 0.05) {
         _sitStandTimer.stop();
         _timerRunning = false;
@@ -96,10 +131,12 @@ class _VideoTrackingScreenState extends State<VideoTrackingScreen> {
 
       setState(() {});
     });
-
+    // Request access to the user's camera
+    // and start the video stream
     window.navigator.mediaDevices?.getUserMedia({'video': true}).then((stream) {
       videoElement.srcObject = stream;
 
+      // Load the MediaPipe Pose library and set up the pose detection
       js.context.callMethod('eval', [
         r'''
         const videoElement = document.getElementById('video-element');
@@ -154,6 +191,11 @@ class _VideoTrackingScreenState extends State<VideoTrackingScreen> {
     });
   }
 
+  /**
+   * build method constructs the UI for the VideoTrackingScreen.
+   * It includes a Scaffold with an AppBar and a Stack for overlaying the timer UI.
+   */
+  ///
   @override
   Widget build(BuildContext context) {
     return Scaffold(
