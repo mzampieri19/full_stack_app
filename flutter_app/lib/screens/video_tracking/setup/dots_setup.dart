@@ -1,27 +1,17 @@
-import 'package:flutter/material.dart';
+import 'dart:html';
+import 'dart:js' as js;
 
-class DotTracker extends StatelessWidget {
-  final List<Offset> jointPositions;
+// Dot setup (drawing pose landmarks)
+void drawPoseLandmarks(List landmarks) {
+  final canvas = document.getElementById('pose-canvas') as CanvasElement;
+  final ctx = canvas.context2D;
 
-  DotTracker({required this.jointPositions});
+  ctx.clearRect(0, 0, canvas.width!, canvas.height!);
 
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: jointPositions.map((position) {
-        return Positioned(
-          left: position.dx,
-          top: position.dy,
-          child: Container(
-            width: 10,
-            height: 10,
-            decoration: BoxDecoration(
-              color: Colors.red,
-              shape: BoxShape.circle,
-            ),
-          ),
-        );
-      }).toList(),
-    );
+  for (final landmark in landmarks) {
+    ctx.beginPath();
+    ctx.arc(landmark['x'] * canvas.width!, landmark['y'] * canvas.height!, 5, 0, 2 * 3.14159);
+    ctx.fillStyle = '#00FF00';
+    ctx.fill();
   }
 }

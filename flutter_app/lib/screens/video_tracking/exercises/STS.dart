@@ -1,48 +1,49 @@
-import 'package:camera/camera.dart';
+import 'dart:html';
 import 'package:flutter/material.dart';
-import 'package:test_app/screens/video_tracking/setup/dots_setup.dart';
-import '../setup/camera_setup.dart';
 
-class SitStandTimer extends StatefulWidget {
-  @override
-  _SitStandTimerState createState() => _SitStandTimerState();
-}
+class SitStandExercise extends StatelessWidget {
+  final VideoElement videoElement;
+  final CanvasElement canvasElement;
 
-class _SitStandTimerState extends State<SitStandTimer> {
-  final CameraSetup cameraSetup = CameraSetup();
-  List<Offset> joints = [];
+  const SitStandExercise({
+    super.key,
+    required this.videoElement,
+    required this.canvasElement,
+  });
 
-  @override
-  void initState() {
-    super.initState();
-    cameraSetup.initializeCamera(_onJointDetected);
-  }
+  bool get timerRunning => false;
 
-  void _onJointDetected(dynamic image) {
-    // Replace this with your joint detection logic
-    setState(() {
-      joints = [Offset(100, 200), Offset(150, 300)]; // Example positions
-    });
-  }
-
-  @override
-  void dispose() {
-    cameraSetup.dispose();
-    super.dispose();
-  }
+  get formattedTime => null;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Sit-Stand Timer")),
-      body: Stack(
-        children: [
-          if (cameraSetup.isInitialized)
-            CameraPreview(cameraSetup.cameraController),
-          DotTracker(jointPositions: joints),
-          // Add timer UI here
-        ],
+      appBar: AppBar(
+        title: const Text('Sit to Stand Exercise'),
+        backgroundColor: Colors.blue,
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'Perform the Sit to Stand Exercise',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Follow the instructions and ensure proper form.',
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  void update(double avgHipY) {
+    // Update the exercise state based on the average hip Y position
+    
+
   }
 }

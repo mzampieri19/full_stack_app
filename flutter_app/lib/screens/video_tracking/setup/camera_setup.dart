@@ -1,31 +1,30 @@
-import 'package:flutter/material.dart';
-import 'package:camera/camera.dart';
+import 'dart:html';
+import 'dart:js' as js;
 
-class CameraSetup {
-  late CameraController cameraController;
-  bool isInitialized = false;
+// Camera setup (video and canvas elements)
+void setupCameraElements() {
+  final videoElement = VideoElement()
+    ..id = 'video-element'
+    ..width = 640
+    ..height = 480
+    ..autoplay = true
+    ..style.position = 'absolute'
+    ..style.top = '50%'
+    ..style.left = '50%'
+    ..style.transform = 'translate(-50%, -50%)'
+    ..style.zIndex = '1'
+    ..style.borderRadius = '10px';
 
-  Future<void> initializeCamera(Function onJointDetected) async {
-    try {
-      final cameras = await availableCameras();
-      cameraController = CameraController(cameras[0], ResolutionPreset.high);
-      await cameraController.initialize();
-      
-      // Set up frame processing here if needed
-      cameraController.startImageStream((image) {
-        // Call the joint detection callback
-        onJointDetected(image);
-      });
+  document.body!.append(videoElement);
 
-      isInitialized = true;
-    } catch (e) {
-      print("Error initializing camera: $e");
-    }
-  }
+  final canvas = CanvasElement(width: 640, height: 480)
+    ..id = 'pose-canvas'
+    ..style.position = 'absolute'
+    ..style.top = '50%'
+    ..style.left = '50%'
+    ..style.transform = 'translate(-50%, -50%)'
+    ..style.zIndex = '2'
+    ..style.pointerEvents = 'none';
 
-  void dispose() {
-    if (isInitialized) {
-      cameraController.dispose();
-    }
-  }
+  document.body!.append(canvas);
 }

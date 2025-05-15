@@ -1,49 +1,121 @@
-import 'package:camera/camera.dart';
+import 'dart:html';
+import 'dart:js' as js;
 import 'package:flutter/material.dart';
-import 'package:test_app/screens/video_tracking/setup/dots_setup.dart';
-import '../setup/camera_setup.dart';
 
-class HandRaiseCounter extends StatefulWidget {
+class RaiseBothHandsExercise extends StatefulWidget {
+  final VideoElement videoElement;
+  final CanvasElement canvasElement;
+
+  const RaiseBothHandsExercise({
+    super.key,
+    required this.videoElement,
+    required this.canvasElement,
+  });
+
   @override
-  _HandRaiseCounterState createState() => _HandRaiseCounterState();
+  State<RaiseBothHandsExercise> createState() => _RaiseBothHandsExerciseState();
 }
 
-class _HandRaiseCounterState extends State<HandRaiseCounter> {
-  final CameraSetup cameraSetup = CameraSetup();
-  List<Offset> joints = [];
-  int handRaiseCount = 0;
+class _RaiseBothHandsExerciseState extends State<RaiseBothHandsExercise> {
+  int raiseCount = 0;
+  bool handsRaised = false; // Track if hands are currently raised
 
   @override
   void initState() {
     super.initState();
-    cameraSetup.initializeCamera(_onJointDetected);
+    _initializePoseTracking();
   }
 
-  void _onJointDetected(dynamic image) {
-    // Replace with your hand raise detection logic
-    setState(() {
-      joints = [Offset(200, 300), Offset(250, 350)]; // Example positions
+  void _initializePoseTracking() {
+    // Attach JavaScript interop to call the `update` function
+    js.context['updateRaiseBothHands'] = js.allowInterop((List<dynamic> landmarks) {
+      update(landmarks);
     });
   }
 
-  @override
-  void dispose() {
-    cameraSetup.dispose();
-    super.dispose();
+  void update(List<dynamic> landmarks) {
+    // Extract relevant landmarks
+    final leftShoulder = landmarks[11];
+    final rightShoulder = landmarks[12];
+    final leftWrist = landmarks[15];
+    final rightWrist = landmarks[16];
+
+    // Check if both hands are raised above the shoulders
+    final handsAreRaised = leftWrist['y'] < leftShoulder['y'] && rightWrist['y'] < rightShoulder['y'];
+
+    // Check if hands were raised and then lowered
+    if (handsAreRaised && !handsRaised) {
+      setState(() {
+        handsRaised = true; // Mark hands as raised
+      });
+    } else if (!handsAreRaised && handsRaised) {
+      setState(() {
+        handsRaised = false; // Reset handsRaised
+        raiseCount++; // Increment the counter
+      });
+    }
+  }
+
+  void reset() {
+    setState(() {
+      raiseCount = 0;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Hand Raise Counter")),
-      body: Stack(
+      appBar: AppBar(
+        title: const Text('Raise Both Hands Exercise'),
+        backgroundColor: Colors.blue,
+      ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (cameraSetup.isInitialized)
-            CameraPreview(cameraSetup.cameraController),
-          DotTracker(jointPositions: joints),
-          // Add counter UI here
+          Expanded(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Perform the Raise Both Hands Exercise',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Follow the instructions and ensure proper form.',
+                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(16.0),
+            color: Colors.grey[200],
+            child: Column(
+              children: [
+                Text(
+                  'Count: $raiseCount',
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: reset,
+                  child: const Text('Reset Counter'),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    // Clean up JavaScript interop
+    js.context.deleteProperty('updateRaiseBothHands');
+    super.dispose();
   }
 }
