@@ -15,38 +15,47 @@ class _EncouragementScreenState extends State<EncouragementScreen> {
 
   // Function to fetch advice from the Gemini API and database
   Future<void> _fetchEncouragingMessage() async {
-    setState(() {
-      _isLoading = true;
-      _advice = null; // Clear the previous advice
-    });
+  setState(() {
+    _isLoading = true;
+    _advice = null; // Clear the previous advice
+  });
 
-    try {
-      final url = Uri.parse('http://192.168.1.195:3000/geminiresponses/generateEncouragement');
-      final response = await http.post(url);
+  try {
+    final url = Uri.parse('http://192.168.1.195:3000/geminiresponses/generateEncouragement');
+    final response = await http.post(url);
 
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      debugPrint('API response: $responseData'); // Log the API response for debugging
 
-        setState(() {
-          // Extract the advice from the "parts" and "text" section
-           final text = responseData?['parts']?[0]?['text'] ?? 'No content available';
-          _advice = text; 
-        });
-      } else {
-        setState(() {
-          _advice = 'Failed to fetch advice. Status code: ${response.statusCode}';
-        });
-      }
-    } catch (e) {
       setState(() {
-        _advice = 'An error occurred: $e';
+        // Safely extract the advice from the "parts" and "text" section
+        if (responseData != null &&
+            responseData['generatedContent'] != null &&
+            responseData['generatedContent']['parts'] is List &&
+            responseData['generatedContent']['parts'].isNotEmpty &&
+            responseData['generatedContent']['parts'][0] is Map &&
+            responseData['generatedContent']['parts'][0]['text'] is String) {
+          _advice = responseData['generatedContent']['parts'][0]['text'];
+        } else {
+          _advice = 'No advice available.';
+        }
       });
-    } finally {
+    } else {
       setState(() {
-        _isLoading = false;
+        _advice = 'Failed to fetch advice. Status code: ${response.statusCode}';
       });
     }
+  } catch (e) {
+    setState(() {
+      _advice = 'An error occurred: $e';
+    });
+  } finally {
+    setState(() {
+      _isLoading = false;
+    });
   }
+}
 
   @override
   Widget build(BuildContext context) {

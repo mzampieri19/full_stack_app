@@ -71,7 +71,7 @@ export const generateEncouragement = async (req, res) => {
 
         // Save the generated encouragement to the database
         const encouragementResponse = new Advice({
-            query: "Generate a motivational quote for a physical therapist to send to a patient.",
+            query: "Generate a motivational quote for a physical therapist to send to a patient. Respond with only the quote and nothing else.",
             response: textContent,
             model: response.modelVersion,
             date: new Date(),
@@ -92,16 +92,14 @@ export const generateEncouragement = async (req, res) => {
 export const getEncouragement = async (req, res) => {
     try {
         const count = await Advice.countDocuments();
-        if (count === 0) {
-            return res.status(404).json({ error: 'No advice found' });
-        }
-
         const randomIndex = Math.floor(Math.random() * count);
         const randomAdvice = await Advice.findOne().skip(randomIndex);
-
-        res.status(200).json(randomAdvice);
+        if (randomAdvice && randomAdvice.response && randomQuote.response.parts) {
+            res.join(randomAdvice);
+        } else {
+            res.status(404).json({ error: "No parts found in the response" });
+        }
     } catch (error) {
-        console.error('Error fetching random advice:', error);
-        res.status(500).json({ error: 'Error fetching random advice' });
+        console.error('Error fetching encouragement:', error);
     }
 }
