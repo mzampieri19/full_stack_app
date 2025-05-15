@@ -2,6 +2,7 @@ import 'dart:html' as html;
 import 'dart:ui_web' as ui show platformViewRegistry;
 import 'package:flutter/material.dart';
 import 'package:test_app/screens/auth_screen.dart';
+import 'package:test_app/screens/dashboard_screen.dart';
 import 'package:test_app/services/auth_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -59,7 +60,33 @@ class MyApp extends StatelessWidget {
       ),
       //home: ChatScreen(currentUser: 'Michael', otherUser: 'icloud', senderEmail: 'michelangeloz03@gmail.com', recieverEmail: 'michii03@icloud.com')
       //home: AiassistantScreen(username: 'Michael', email: 'michelangeloz03@gmail.com',),
-      home: AuthScreen(username:'', email:''), // Set the home screen to AuthScreen
+      //home: AuthScreen(username:'', email:''), // Set the home screen to AuthScreen
+      home: DashboardScreen(
+        username: 'Michael', 
+        email: 'michelangeloz03@gmail.com', 
+        users: [
+                {
+                  'username': 'Michael',
+                  'email': 'michelangeloz03@gmail.com',
+                  'password': 'Michi.2003!',
+                },
+                {
+                  'username': 'icloud',
+                  'email': 'michii03@icloud.com',
+                  'password': 'Michi.2003!',
+                },
+                {
+                  'username': 'Brandeis',
+                  'email': 'mzampieri@brandeis.edu',
+                  'password': 'Michi.2003!',
+                },
+                {
+                  'username': 'Imago',
+                  'email': 'michelangelo.zampieri@imagorehab.com',
+                  'password': 'Michi.2003!',
+                },
+              ]
+    )
     );
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:test_app/screens/captcha_screen.dart';
+import 'package:test_app/screens/dashboard_screen.dart';
 import 'package:test_app/services/user_service.dart';
-import 'package:test_app/widgets/encouragement_widget.dart';
 import 'package:test_app/widgets/password_requirments.dart';
 
 import 'user_list_screen.dart';
@@ -78,18 +78,14 @@ class _AuthScreenState extends State<AuthScreen> {
           .toList();
 
       debugPrint('Login successful for username: $username');
-      debugPrint('Navigating to UserListScreen with username: $username, email: $email');
+      debugPrint('Navigating to dashboard with username: $username, email: $email');
       setState(() {
         _isLoading = false; // Reset loading state before navigation
       });
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => UserListScreen(
-            currentUser: username,
-            currentUserEmail: email,
-            users: users,
-          ),
+          builder: (context) => DashboardScreen(username: username, email: email, users: users), // Pass the user details to the Dashboard
         ),
       );
     } else {
@@ -266,7 +262,6 @@ class _AuthScreenState extends State<AuthScreen> {
                 ),
               ),
               SizedBox(height: 20),
-              EncouragementWidget()
             ],
           ),
         ),

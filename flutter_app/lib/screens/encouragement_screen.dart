@@ -2,14 +2,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-class EncouragementWidget extends StatefulWidget {
-  const EncouragementWidget({super.key});
+class EncouragementScreen extends StatefulWidget {
+  const EncouragementScreen({super.key});
 
   @override
-  State<EncouragementWidget> createState() => _EncouragementWidgetState();
+  State<EncouragementScreen> createState() => _EncouragementScreenState();
 }
 
-class _EncouragementWidgetState extends State<EncouragementWidget> {
+class _EncouragementScreenState extends State<EncouragementScreen> {
   String? _advice; // Store the advice (either generated or random)
   bool _isLoading = false; // Track the loading state
 
@@ -52,29 +52,35 @@ class _EncouragementWidgetState extends State<EncouragementWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Display the advice
-          if (_advice != null)
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                _advice!,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Encouragement'),
+        backgroundColor: Colors.blue,
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Display the advice
+            if (_advice != null)
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  _advice!,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
               ),
+            // Show a loading indicator while fetching the message
+            if (_isLoading)
+              const CircularProgressIndicator(),
+            // Button to fetch the encouraging message
+            ElevatedButton(
+              onPressed: _isLoading ? null : _fetchEncouragingMessage,
+              child: const Text('Get Encouragement'),
             ),
-          // Show a loading indicator while fetching the message
-          if (_isLoading)
-            const CircularProgressIndicator(),
-          // Button to fetch the encouraging message
-          ElevatedButton(
-            onPressed: _isLoading ? null : _fetchEncouragingMessage,
-            child: const Text('Get Encouragement'),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -40,6 +40,8 @@ dependencies:
   webview_flutter: ^4.11.0
   hcaptcha_flutter: ^0.0.1+1
   file_picker: ^8.0.7
+  camera: ^0.11.0
+  google_ml_kit: ^0.20.0
 
 
 
