@@ -39,7 +39,7 @@ class _AiassistantScreenState extends State<AiassistantScreen> {
   File? _selectedFile;
   final TextEditingController _queryController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  List<dynamic> _messages = [];
+  final List<dynamic> _messages = [];
 
   @override
   void initState() {
