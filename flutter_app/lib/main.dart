@@ -1,92 +1,68 @@
-import 'dart:html' as html;
-import 'dart:ui_web' as ui show platformViewRegistry;
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:test_app/screens/auth_screen.dart';
-import 'package:test_app/screens/dashboard_screen.dart';
-import 'package:test_app/services/auth_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:provider/provider.dart';
+import 'package:test_app/screens/dashboard_screen.dart';
+import 'app_state.dart';
+import 'call_screen.dart';
 
-/**
- * registerViewFactories function registers a view factory for the hcaptcha-container.
- * It creates a DivElement with specific styles and an ID.
- * This is used to display the hCaptcha widget in the Flutter web application.
- * This was used for an earlier implementation of the hCaptcha widget, now using a different approach.
- */
-///
-void registerViewFactories() {
-  ui.platformViewRegistry.registerViewFactory(
-    'hcaptcha-container',
-    (int viewId) => html.DivElement()
-      ..id = 'hcaptcha-container'
-      ..style.width = '300px'
-      ..style.height = '150px'
-      ..style.display = 'block',
+import 'package:universal_html/html.dart' as html;
+import 'package:flutter/material.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:provider/provider.dart';
+import 'app_state.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load();
+  final dbUrl = dotenv.env['FIREBASE_DATABASE_URL'];
+  if (dbUrl == null) {
+    throw Exception('FIREBASE_DATABASE_URL not found in .env file');
+  }
+  final db = FirebaseDatabase.instanceFor(
+    app: Firebase.app(),
+    databaseURL: dbUrl,
+  );
+  await Firebase.initializeApp(
+    options: FirebaseOptions(
+      apiKey: dotenv.env['FIREBASE_API_KEY']!,
+      authDomain: dotenv.env['FIREBASE_AUTH_DOMAIN']!,
+      projectId: dotenv.env['FIREBASE_PROJECT_ID']!,
+      storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET']!,
+      messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID']!,
+      appId: dotenv.env['FIREBASE_APP_ID']!,
+      measurementId: dotenv.env['FIREBASE_MEASUREMENT_ID']!,
+    ),
+  );
+  // Initialize WebRTC for web
+  if (WebRTC.platformIsWeb) {
+    await html.window.navigator.mediaDevices?.getUserMedia({'audio': true, 'video': true});
+  }
+  
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => AppState(),
+      child: const MyApp(),
+    ),
   );
 }
 
-/**
- * main function is the entry point of the Flutter web application.
- * It loads environment variables from a .env file, registers view factories,
- * initializes the AuthService, and runs the MyApp widget.
- */
-///
-Future<void> main() async {
-  await dotenv.load(fileName: "assets/.env");
-  registerViewFactories(); // Register the view factories
-  AuthService.initialize();
-  runApp(const MyApp());
-}
-
-/**
- * MyApp is the main widget of the Flutter application.
- * It sets up the MaterialApp with a title, theme, and home screen.
- * The home screen is set to AuthScreen, which handles user authentication.
- */
-///
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  /**
-   * The build method returns a MaterialApp widget with a title, theme, and home screen.
-   * The home screen is set to AuthScreen, which handles user authentication.
-   */
-   ///
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'test_app',
+      title: 'Gesture Tracker',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      //home: VideoTrackingScreen()
-      //home: ChatScreen(currentUser: 'Michael', otherUser: 'icloud', senderEmail: 'michelangeloz03@gmail.com', recieverEmail: 'michii03@icloud.com')
-      //home: AiassistantScreen(username: 'Michael', email: 'michelangeloz03@gmail.com',),
-      //home: AuthScreen(username:'', email:''), // Set the home screen to AuthScreen
-      home: DashboardScreen(
-        username: 'Michael', 
-        email: 'michelangeloz03@gmail.com', 
-        users: [
-                {
-                  'username': 'Michael',
-                  'email': 'michelangeloz03@gmail.com',
-                  'password': 'Michi.2003!',
-                },
-                {
-                  'username': 'icloud',
-                  'email': 'michii03@icloud.com',
-                  'password': 'Michi.2003!',
-                },
-                {
-                  'username': 'Brandeis',
-                  'email': 'mzampieri@brandeis.edu',
-                  'password': 'Michi.2003!',
-                },
-                {
-                  'username': 'Imago',
-                  'email': 'michelangelo.zampieri@imagorehab.com',
-                  'password': 'Michi.2003!',
-                },
-              ]
+      home: const DashboardScreen(
+        username: 'Michael',
+        email: 'email@gmail.com',
+        users:[],
       )
     );
   }

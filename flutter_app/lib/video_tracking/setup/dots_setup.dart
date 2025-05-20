@@ -1,5 +1,4 @@
 import 'dart:html';
-import 'dart:js' as js;
 
 // Dot setup (drawing pose landmarks)
 void drawPoseLandmarks(List landmarks) {
