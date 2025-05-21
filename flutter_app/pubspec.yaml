@@ -39,7 +39,7 @@ dependencies:
   webview_flutter: ^4.11.0
   hcaptcha_flutter: ^0.0.1+1
   file_picker: ^8.0.7
-  flutter_webrtc: 0.9.28 # Not 0.9.48 which has web issues
+  flutter_webrtc: ^0.14.0 # Not 0.9.48 which has web issues
   camera: ^0.10.5
   google_mlkit_pose_detection: ^0.6.0
   google_mlkit_face_detection: ^0.6.0

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:test_app/video_tracking/setup/camera_setup.dart';
+import 'package:test_app/web_rtc_old/setup/camera_setup.dart';
 
 class SitStandExercise extends StatefulWidget {
   const SitStandExercise({super.key});

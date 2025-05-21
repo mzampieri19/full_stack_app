@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:test_app/video_tracking/exercises/RBH.dart';
-import 'package:test_app/video_tracking/exercises/STS.dart';
+import 'package:test_app/web_rtc_old/exercises/RBH.dart';
+import 'package:test_app/web_rtc_old/exercises/STS.dart';
 
 
 class VideoTrackingScreen extends StatelessWidget {

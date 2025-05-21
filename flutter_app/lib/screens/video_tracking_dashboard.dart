@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:test_app/video_tracking/exercises/RBH.dart';
-import 'package:test_app/video_tracking/exercises/STS.dart';
+import 'package:test_app/web_rtc_new/new_call_screen.dart';
+import 'package:test_app/web_rtc_old/exercises/RBH.dart';
+import 'package:test_app/web_rtc_old/exercises/STS.dart';
 
 class VideoTrackingDashboard extends StatelessWidget {
   const VideoTrackingDashboard({super.key});
@@ -30,6 +31,14 @@ class VideoTrackingDashboard extends StatelessWidget {
                 MaterialPageRoute(builder: (_) => const RaiseBothHandsExercise()),
               ),
               child: const Text('Raise Both Hands Exercise'),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const VideoTrackingScreen()),
+              ),
+              child: const Text('Join a video call with motion tracking'),
             ),
           ],
         ),
