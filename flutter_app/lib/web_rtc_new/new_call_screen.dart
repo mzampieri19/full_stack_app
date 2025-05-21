@@ -21,7 +21,9 @@ class _VideoTrackingScreenState extends State<VideoTrackingScreen> {
   late final PoseDetector _poseDetector;
   List<PoseLandmark> _landmarks = [];
   String? _roomId;
+  // ignore: unused_field
   DatabaseReference? _roomRef;
+  // ignore: unused_field
   Uint8List? _data;
 
   @override
@@ -61,32 +63,30 @@ class _VideoTrackingScreenState extends State<VideoTrackingScreen> {
 
       // Use captureFrame() on the video track (web only, flutter_webrtc >=0.9.40)
       final buffer = await track.captureFrame();
-      if (buffer != null) {
-        final bytes = buffer.asUint8List();
-        final codec = await ui.instantiateImageCodec(bytes);
-        final frame = await codec.getNextFrame();
-        final image = frame.image;
+      final bytes = buffer.asUint8List();
+      final codec = await ui.instantiateImageCodec(bytes);
+      final frame = await codec.getNextFrame();
+      final image = frame.image;
 
-        final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-        if (byteData != null) {
-          final inputImage = InputImage.fromBytes(
-            bytes: byteData.buffer.asUint8List(),
-            inputImageData: InputImageData(
-              size: Size(image.width.toDouble(), image.height.toDouble()),
-              imageRotation: InputImageRotation.rotation0deg,
-              inputImageFormat: InputImageFormat.bgra8888,
-              planeData: [],
-            ),
-          );
-          final poses = await _poseDetector.processImage(inputImage);
-          if (poses.isNotEmpty) {
-            setState(() {
-              _landmarks = poses.first.landmarks.values.toList();
-            });
-          }
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData != null) {
+        final inputImage = InputImage.fromBytes(
+          bytes: byteData.buffer.asUint8List(),
+          inputImageData: InputImageData(
+            size: Size(image.width.toDouble(), image.height.toDouble()),
+            imageRotation: InputImageRotation.rotation0deg,
+            inputImageFormat: InputImageFormat.bgra8888,
+            planeData: [],
+          ),
+        );
+        final poses = await _poseDetector.processImage(inputImage);
+        if (poses.isNotEmpty) {
+          setState(() {
+            _landmarks = poses.first.landmarks.values.toList();
+          });
         }
       }
-    } catch (e) {
+        } catch (e) {
       // Optionally log error
     }
     await Future.delayed(const Duration(milliseconds: 200));
