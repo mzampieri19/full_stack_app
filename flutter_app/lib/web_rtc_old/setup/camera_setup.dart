@@ -1,6 +1,14 @@
 import 'dart:html';
 import 'dart:js' as js;
 
+/**
+ * initializePoseTracking initializes the pose tracking using MediaPipe Pose.
+ * It sets up the video element, canvas, and JavaScript functions for pose detection.
+ * The function takes two callbacks: sitStandCallback and raiseHandCallback.
+ * sitStandCallback is called with the average hip Y coordinate,
+ * and raiseHandCallback is called when both hands are raised.
+ */
+///
 void initializePoseTracking(Function(double) sitStandCallback, Function() raiseHandCallback) {
   final videoElement = VideoElement()
     ..id = 'video-element'

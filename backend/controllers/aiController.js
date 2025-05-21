@@ -6,6 +6,12 @@ import GeminiResponse from '../models/GeminiResponse.js';
 import Advice from '../models/Advice.js';
 import { GoogleGenAI } from "@google/genai";
 
+/**
+ * @function sendQuery
+ * @description Sends a query to the Gemini API and saves the response to the database.
+ * @param {Object} req - The request object containing the query and other parameters.
+ * @param {Object} res - The response object to send the result back to the client.
+ */
 export const sendQuery = async (req, res) => {
     const { query, date, sender, sender_email, fileData } = req.body;
 
@@ -46,6 +52,12 @@ export const sendQuery = async (req, res) => {
     }
 };
 
+/**
+ * @function getGeminiResponses
+ * @description Fetches all responses from the database and sends them back to the client.
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object to send the result back to the client.
+ */
 export const getGeminiResponses = async (req, res) => {
     try {
         const responses = await GeminiResponse.find().sort({ date: -1 });
@@ -56,6 +68,12 @@ export const getGeminiResponses = async (req, res) => {
     }
 };
 
+/**
+ * @function getGeminiResponseById
+ * @description Fetches a specific response by ID from the database and sends it back to the client.
+ * @param {Object} req - The request object containing the ID of the response to fetch.
+ * @param {Object} res - The response object to send the result back to the client.
+ */
 export const generateEncouragement = async (req, res) => {
     try {
         const API_KEY = process.env.GEMINI_API_KEY;
@@ -89,6 +107,12 @@ export const generateEncouragement = async (req, res) => {
     }
 };
 
+/**
+ * @function getGeminiResponseById
+ * @description Fetches a specific response by ID from the database and sends it back to the client.
+ * @param {Object} req - The request object containing the ID of the response to fetch.
+ * @param {Object} res - The response object to send the result back to the client.
+ */
 export const getEncouragement = async (req, res) => {
     try {
         const count = await Advice.countDocuments();

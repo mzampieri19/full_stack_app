@@ -1,6 +1,10 @@
 import 'dart:html';
 
-// Dot setup (drawing pose landmarks)
+/**
+ * initializePoseTracking initializes the pose tracking using MediaPipe Pose.
+ * It sets up the video element, canvas, and JavaScript functions for pose detection.
+ */
+///
 void drawPoseLandmarks(List landmarks) {
   final canvas = document.getElementById('pose-canvas') as CanvasElement;
   final ctx = canvas.context2D;

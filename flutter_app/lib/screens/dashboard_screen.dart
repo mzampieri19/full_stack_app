@@ -2,9 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:test_app/screens/aiassistant_screen.dart';
 import 'package:test_app/screens/user_list_screen.dart';
 import 'package:test_app/screens/encouragement_screen.dart';
-import 'package:test_app/screens/video_tracking_dashboard.dart'; // Import the new screen
-import 'package:test_app/widgets/dashboard_card.dart'; // Import the DashboardCard widget
+import 'package:test_app/screens/video_tracking_dashboard.dart'; 
+import 'package:test_app/widgets/dashboard_card.dart';
 
+/**
+ * DashboardScreen is a StatelessWidget that represents the main dashboard of the application.
+ * It displays a welcome message and provides options for the user to navigate to different features.
+ * The screen includes cards for AI Assistant, User List, Encouragement, and Automated Video Tracking.
+ * The screen is initialized with the user's username, email, and a list of users.
+ * It uses a GridView to display the cards in a grid layout.
+ */
+///
 class DashboardScreen extends StatelessWidget {
   final String username;
   final String email;
@@ -12,6 +20,12 @@ class DashboardScreen extends StatelessWidget {
 
   const DashboardScreen({super.key, required this.username, required this.email, required this.users});
 
+  /**
+   * The build method returns a Scaffold widget that contains the AppBar and the body of the screen.
+   * The body includes a welcome message, a prompt for user action, and a GridView with cards.
+   * Each card is clickable and navigates to the corresponding screen when tapped.
+   */
+  ///
   @override
   Widget build(BuildContext context) {
     return Scaffold(

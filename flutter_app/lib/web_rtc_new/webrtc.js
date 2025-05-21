@@ -1,3 +1,11 @@
+/**
+ * @fileoverview: This file sets up the Express server, connects to MongoDB, and defines the API routes.
+ * It uses the dotenv package to load environment variables, cors for cross-origin resource sharing,
+ * and mongoose for MongoDB object modeling.
+ * @description: The server listens on a specified port and handles incoming requests to various routes.
+ * The routes include authentication, messages, users, AI responses, and chat rooms.
+ */
+
 import { database } from './fb.js';
 import { startLocalPose, startRemotePose } from './pose.js';
 
@@ -6,6 +14,10 @@ let localStream, remoteStream, peerConnection;
 let callerCiQueue = [], calleeCiQueue = [];
 let remotePoseStarted = false;
 
+/**
+ * Starts the local camera and initializes the pose detection.
+ * @returns {Promise<void>}
+ */
 export async function startLocalCamera() {
   localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
   elements.localVideo.srcObject = localStream;
@@ -19,6 +31,9 @@ export async function startLocalCamera() {
   });
 }
 
+/**
+ * Initializes the peer connection and sets up event handlers.
+ */
 function initConnection() {
   peerConnection = new RTCPeerConnection(rtcConfig);
   remoteStream = new MediaStream();
@@ -34,6 +49,10 @@ function initConnection() {
   };
 }
 
+/**
+ * Creates a new room and sets up the signaling process.
+ * @returns {Promise<void>}
+ */
 export async function createRoom() {
   if (!localStream) await startLocalCamera();
   initConnection();
@@ -62,6 +81,10 @@ export async function createRoom() {
   });
 }
 
+/**
+ * Joins an existing room and sets up the signaling process.
+ * @returns {Promise<void>}
+ */
 export async function joinRoom() {
   const roomId = elements.roomIdInput.value.trim();
   if (!roomId) return alert('Enter Room ID');
@@ -90,6 +113,10 @@ export async function joinRoom() {
   drainQueue(calleeCiQueue);
 }
 
+/**
+ * Drains the ICE candidate queue and adds candidates to the peer connection.
+ * @param {Array} queue - The queue of ICE candidates.
+ */
 function drainQueue(queue) {
   queue.forEach(c => peerConnection.addIceCandidate(c));
   queue.length = 0;

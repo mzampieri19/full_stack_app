@@ -1,3 +1,11 @@
+/**
+ * @fileoverview: This file sets up the Express server, connects to MongoDB, and defines the API routes.
+ * It uses the dotenv package to load environment variables, cors for cross-origin resource sharing,
+ * and mongoose for MongoDB object modeling.
+ * @description: The server listens on a specified port and handles incoming requests to various routes.
+ * The routes include authentication, messages, users, AI responses, and chat rooms.
+ */
+
 export const elements = {
   localVideo:      document.getElementById('localVideo'),
   remoteVideo:     document.getElementById('remoteVideo'),
@@ -11,15 +19,3 @@ export const elements = {
   currentRoomEl:   document.getElementById('currentRoom'),
   togglePose:      document.getElementById('togglePose'),
 };
-
-// export const localVideo = document.getElementById('localVideo');
-// export const remoteVideo = document.getElementById('remoteVideo');
-// export const localCanvas = document.getElementById('localCanvas');
-// export const remoteCanvas = document.getElementById('remoteCanvas');
-// export const localContainer = document.getElementById('localContainer');
-// export const remoteContainer = document.getElementById('remoteContainer');
-// export const createRoomBtn = document.getElementById('createRoom');
-// export const joinRoomBtn = document.getElementById('joinRoom');
-// export const roomIdInput = document.getElementById('roomIdInput');
-// export const currentRoomEl = document.getElementById('currentRoom');
-// export const togglePose = document.getElementById('togglePose');

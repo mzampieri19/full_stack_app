@@ -3,6 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:test_app/screens/auth_screen.dart';
 
+/**
+ * Main entry point of the Flutter application.
+ * It initializes Firebase and loads environment variables from a .env file.
+ * It sets up the app theme and home screen.
+ */
+///
 void main() async {
   await dotenv.load(fileName: "/.env");
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,9 +28,19 @@ void main() async {
   runApp(const MyApp());
 }
 
+/**
+ * MyApp is the main widget of the application.
+ * It sets up the MaterialApp with a title, theme, and home screen.
+ */
+///
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  /**
+   * The build method returns a MaterialApp widget that contains the title, theme, and home screen.
+   * The home screen is set to AuthScreen with empty username and email.
+   */
+   ///
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

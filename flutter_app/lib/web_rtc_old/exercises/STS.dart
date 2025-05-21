@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:test_app/web_rtc_old/setup/camera_setup.dart';
 
+/**
+ * SitStandExercise is a StatefulWidget that represents an exercise screen
+ * where the user is prompted to perform a sit-stand exercise.
+ * It tracks the user's pose using ML Kit and measures the time spent standing.
+ * The screen includes a message prompting the user to stand and displays the elapsed time.
+ */
+ ///
 class SitStandExercise extends StatefulWidget {
   const SitStandExercise({super.key});
 
@@ -8,11 +15,23 @@ class SitStandExercise extends StatefulWidget {
   State<SitStandExercise> createState() => _SitStandExerciseState();
 }
 
+/**
+ * _SitStandExerciseState is the state class for SitStandExercise.
+ * It manages the state of the exercise, including the timer for standing time.
+ * It initializes pose tracking and updates the timer based on the user's hip position.
+ */
+ ///
 class _SitStandExerciseState extends State<SitStandExercise> {
   double? _initialHipY;
   final Stopwatch _timer = Stopwatch();
   bool _timerRunning = false;
 
+  /**
+   * _formatTime function formats the elapsed time from the stopwatch
+   * into a string in the format "MM:SS.ms".
+   * It calculates the minutes, seconds, and milliseconds from the elapsed time
+   */
+  ///
   String get _formattedTime {
     final elapsed = _timer.elapsed;
     final minutes = elapsed.inMinutes.toString().padLeft(2, '0');
@@ -27,6 +46,11 @@ class _SitStandExerciseState extends State<SitStandExercise> {
     initializePoseTracking(_onHipPositionUpdate, () {});
   }
 
+  /**
+   * _onHipPositionUpdate is a callback function that is called when the user's hip position is updated.
+   * It calculates the displacement from the initial hip position and starts/stops the timer accordingly.
+   */
+   ///
   void _onHipPositionUpdate(double avgHipY) {
     _initialHipY ??= avgHipY;
 
@@ -47,6 +71,11 @@ class _SitStandExerciseState extends State<SitStandExercise> {
     setState(() {});
   }
 
+  /**
+   * The build method returns a Scaffold widget that contains the AppBar and the body of the screen.
+   * The body includes a message prompting the user to stand and displays the elapsed time.
+   */
+   ///
   @override
   Widget build(BuildContext context) {
     return Scaffold(

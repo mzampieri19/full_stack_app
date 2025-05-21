@@ -1,5 +1,17 @@
+/**
+ * @fileoverview: This file sets up the Express server, connects to MongoDB, and defines the API routes.
+ * It uses the dotenv package to load environment variables, cors for cross-origin resource sharing,
+ * and mongoose for MongoDB object modeling.
+ * @description: The server listens on a specified port and handles incoming requests to various routes.
+ * The routes include authentication, messages, users, AI responses, and chat rooms.
+ */
+
 import { localVideo, remoteVideo, localCanvas, remoteCanvas } from './elements.js';
 
+/**
+ * Starts the local camera and initializes the pose detection.
+ * @returns {Promise<void>}
+ */
 export function startLocalPose() {
   console.log('Starting local pose...');
 
@@ -21,6 +33,10 @@ export function startLocalPose() {
   localCamera.start();
 }
 
+/**
+ * Starts the remote pose detection.
+ * @returns {Promise<void>}
+ */
 export function startRemotePose() {
  console.log('Starting remote pose...');
 
@@ -51,6 +67,12 @@ export function startRemotePose() {
   console.log('Remote pose started');
 }
 
+/**
+ * Draws the results of the pose detection on the canvas.
+ * @param {Object} results - The results from the pose detection.
+ * @param {*} results 
+ * @param {*} canvas 
+ */
 export function drawResults(results, canvas) {
   const ctx = canvas.getContext('2d');
   ctx.save();

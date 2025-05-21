@@ -2,6 +2,13 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
+/**
+ * CallScreen is a StatefulWidget that represents a video call screen.
+ * It allows users to create or join a video call room using WebRTC and Firebase Realtime Database.
+ * The screen includes local and remote video views, and buttons to start or join a call.
+ * The screen uses the flutter_webrtc package for WebRTC functionality and the firebase_database package for real-time communication.
+ */
+///
 class CallScreen extends StatefulWidget {
   const CallScreen({super.key});
 
@@ -9,6 +16,12 @@ class CallScreen extends StatefulWidget {
   State<CallScreen> createState() => _CallScreenState();
 }
 
+/**
+ * _CallScreenState is the state class for CallScreen.
+ * It manages the state of the video call, including local and remote video streams, and room management.
+ * It also handles the initialization of video renderers, starting local streams, and room creation/joining.
+ */
+///
 class _CallScreenState extends State<CallScreen> {
   late RTCPeerConnection peerConnection;
   final localRenderer = RTCVideoRenderer();
@@ -23,7 +36,6 @@ class _CallScreenState extends State<CallScreen> {
     initRenderers();
   }
 
-
   @override
   void dispose() {
     localRenderer.dispose();
@@ -32,11 +44,22 @@ class _CallScreenState extends State<CallScreen> {
     super.dispose();
   }
 
+  /**
+   * initRenderers initializes the local and remote video renderers.
+   * It sets up the video rendering for local and remote streams.
+   * This method is called during the initialization of the state.
+   */
+  ///
   Future<void> initRenderers() async {
     await localRenderer.initialize();
     await remoteRenderer.initialize();
   }
 
+  /**
+   * startWebRTC starts the WebRTC connection.
+   * It sets up the peer connection and either creates or joins a room based on the isCaller flag.
+   */
+  ///
   Future<void> startWebRTC() async {
     await _setupPeerConnection();
 
@@ -47,6 +70,12 @@ class _CallScreenState extends State<CallScreen> {
     }
   }
 
+  /**
+   * _setupPeerConnection sets up the WebRTC peer connection.
+   * It initializes the local and remote video streams and handles
+   * ICE candidates for establishing the connection.
+   */
+  ///
   Future<void> _setupPeerConnection() async {
     final config = {
       'iceServers': [
@@ -74,6 +103,11 @@ class _CallScreenState extends State<CallScreen> {
     };
   }
 
+  /**
+   * _createRoom creates a new room in Firebase Realtime Database.
+   * It sets up the offer and ICE candidates for the caller.
+   */
+  ///
   Future<void> _createRoom() async {
     final roomRef = FirebaseDatabase.instance.ref('rooms/$roomId');
     final callerCandidatesRef = roomRef.child('callerCandidates');
@@ -115,6 +149,11 @@ class _CallScreenState extends State<CallScreen> {
     });
   }
 
+  /**
+   * _joinRoom joins an existing room in Firebase Realtime Database.
+   * It sets up the answer and ICE candidates for the callee.
+   */
+  ///
   Future<void> _joinRoom() async {
     final roomRef = FirebaseDatabase.instance.ref('rooms/$roomId');
     final offerSnapshot = await roomRef.child('offer').get();
@@ -157,6 +196,11 @@ class _CallScreenState extends State<CallScreen> {
     });
   }
 
+  /**
+   * The build method returns a Scaffold widget that contains the AppBar and the body of the screen.
+   * The body includes local and remote video views, and buttons to start or join a call.
+   */
+  ///
   @override
   Widget build(BuildContext context) {
     return Scaffold(

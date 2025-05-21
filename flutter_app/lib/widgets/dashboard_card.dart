@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 
+/**
+ * DashboardCard is a StatelessWidget that represents a card in the dashboard.
+ * It includes an icon, title, description, and a callback function for tap events.
+ */
+///
 class DashboardCard extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -14,6 +19,12 @@ class DashboardCard extends StatelessWidget {
     required this.onTap,
   });
 
+  /**
+   * The build method returns a GestureDetector widget that wraps a Card widget.
+   * The Card widget contains an icon, title, and description.
+   * When the card is tapped, the onTap callback is triggered.
+   */
+   ///
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
