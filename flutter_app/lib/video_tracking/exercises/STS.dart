@@ -10,7 +10,7 @@ class SitStandExercise extends StatefulWidget {
 
 class _SitStandExerciseState extends State<SitStandExercise> {
   double? _initialHipY;
-  Stopwatch _timer = Stopwatch();
+  final Stopwatch _timer = Stopwatch();
   bool _timerRunning = false;
 
   String get _formattedTime {
@@ -28,9 +28,7 @@ class _SitStandExerciseState extends State<SitStandExercise> {
   }
 
   void _onHipPositionUpdate(double avgHipY) {
-    if (_initialHipY == null) {
-      _initialHipY = avgHipY;
-    }
+    _initialHipY ??= avgHipY;
 
     final displacement = _initialHipY! - avgHipY;
     const standingThreshold = 0.15;

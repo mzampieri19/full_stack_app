@@ -1,9 +1,6 @@
-import 'dart:html';
-import 'dart:js' as js;
 import 'package:flutter/material.dart';
 import 'package:test_app/video_tracking/exercises/RBH.dart';
 import 'package:test_app/video_tracking/exercises/STS.dart';
-import 'package:test_app/widgets/dashboard_card.dart';
 
 class VideoTrackingDashboard extends StatelessWidget {
   const VideoTrackingDashboard({super.key});

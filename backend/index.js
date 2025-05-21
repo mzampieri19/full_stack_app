@@ -8,4 +8,4 @@ import dotenv from 'dotenv';
 import connectDB from './config/db.js'; // Import the database connection function
 
 connectDB(); // Establish MongoDB connection
-app.listen(3000, () => console.log(`Server running on port ${3000}`));
+app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));

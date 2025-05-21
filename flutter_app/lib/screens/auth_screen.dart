@@ -4,7 +4,6 @@ import 'package:test_app/screens/dashboard_screen.dart';
 import 'package:test_app/services/user_service.dart';
 import 'package:test_app/widgets/password_requirments.dart';
 
-import 'user_list_screen.dart';
 
 import '../services/auth_service.dart';
 import '../widgets/custom_text_field.dart';
