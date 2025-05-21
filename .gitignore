@@ -2,3 +2,6 @@
 /backend/package-lock.json
 /backend/package.json
 /flutter_app/ios/
+.vscode/
+.DS_Store/
+/.vscode
